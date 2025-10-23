@@ -1,5 +1,6 @@
 package com.lenora.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -16,6 +17,7 @@ public class ExaminationResponse {
 
     private String patientName;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime examinationDateTime;
 
     private String examinationDiagnosis;

@@ -1,5 +1,6 @@
 package com.lenora.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lenora.entity.enums.Role;
 import lombok.*;
 
@@ -17,5 +18,6 @@ public class UserResponse {
     private String email;
     private Role role;
     private Boolean active;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDateTime;
 }
