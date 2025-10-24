@@ -2,7 +2,6 @@ package com.lenora.service;
 
 import com.lenora.entity.concretes.User;
 import com.lenora.exception.ConflictException;
-import com.lenora.exception.ResourceNotFoundException;
 import com.lenora.payload.mapper.UserMapper;
 import com.lenora.payload.messages.ErrorMessages;
 import com.lenora.payload.messages.SuccessMessages;
@@ -11,7 +10,7 @@ import com.lenora.payload.response.ResponseMessage;
 import com.lenora.payload.response.UserResponse;
 import com.lenora.repository.UserRepository;
 import com.lenora.service.helper.HelperMethods;
-import lombok.RequiredArgsConstructor;;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,34 +25,29 @@ public class UserService {
     private final UserMapper userMapper;
     private final HelperMethods helperMethods;
 
-
     // !!! 1) saveUser (Yeni kullanıcı oluşturma)
     @Transactional
-    public ResponseMessage<UserResponse> saveUser(UserRequest userRequest){
-
-        //Bu username ile kayıtlı kullanıcı var mı kontrolü
-        if(helperMethods.checkUserNameExists(userRequest.getUserName())){
-            throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName()));
+    public ResponseMessage<UserResponse> saveUser(UserRequest userRequest) {
+        if (helperMethods.checkUserNameExists(userRequest.getUserName())) {
+            throw new ConflictException(
+                    String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName())
+            );
         }
 
-        //userRequest'i User'a çevirdi
         User user = userMapper.userRequestToUser(userRequest);
-
-        //User artık DB'ye kaydolmaya hazır.
         User savedUser = userRepository.save(user);
 
         return ResponseMessage.<UserResponse>builder()
-                .message(SuccessMessages.USER_CREATED_SUCCESSFULY) //Kaydetme başarılı mesajı
-                .httpStatus(HttpStatus.CREATED) //CREATED http kodu -> 201
-                .object(userMapper.userToUserResponse(savedUser)) //Kaydedilen UserResponse
+                .message(SuccessMessages.USER_CREATED_SUCCESSFULY)
+                .httpStatus(HttpStatus.CREATED)
+                .object(userMapper.userToUserResponse(savedUser))
                 .build();
     }
 
     // !!! 2) getAllUserWithList (Tüm kullanıcıları getir)
-    public ResponseMessage<List<UserResponse>> getAllUserWithList(){
-        List<User> users = userRepository.findAll();
-
-        List<UserResponse> userList = users.stream()
+    public ResponseMessage<List<UserResponse>> getAllUserWithList() {
+        List<UserResponse> userList = userRepository.findAll()
+                .stream()
                 .map(userMapper::userToUserResponse)
                 .toList();
 
@@ -62,11 +56,10 @@ public class UserService {
                 .httpStatus(HttpStatus.OK)
                 .object(userList)
                 .build();
-
     }
 
-    // !!! 3) getById (İstenilen id'li kullanıcıyı getir)
-    public ResponseMessage<UserResponse> getUserById(Long id){
+    // !!! 3) getUserById (İstenilen id'li kullanıcıyı getir)
+    public ResponseMessage<UserResponse> getUserById(Long id) {
         User user = helperMethods.getByIdUser(id);
 
         return ResponseMessage.<UserResponse>builder()
@@ -74,28 +67,22 @@ public class UserService {
                 .httpStatus(HttpStatus.OK)
                 .object(userMapper.userToUserResponse(user))
                 .build();
-
     }
 
-    // !!! 4) updateUser (Kullanıcı güncelleme)
-    @Transactional //method çalışırken exception olursa DB değişiklikleri otomatik geri alınır (rollback)
-    public ResponseMessage<UserResponse> updateUserById(Long id, UserRequest userRequest){
-        //güncellenmek istenilen kullanıcı DB'de var mı
+    // !!! 4) updateUserById (Kullanıcı güncelleme)
+    @Transactional
+    public ResponseMessage<UserResponse> updateUserById(Long id, UserRequest userRequest) {
         User user = helperMethods.getByIdUser(id);
 
-        //Username değişmişse ve başka bir kullanıcıda varsa hata fırlat
+        // Username başka kullanıcıda varsa hata
         if (!user.getUserName().equalsIgnoreCase(userRequest.getUserName()) &&
                 helperMethods.checkUserNameExists(userRequest.getUserName())) {
-            throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName()));
+            throw new ConflictException(
+                    String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName())
+            );
         }
 
-//        // Password boş değilse veya null değilse encode et
-//        if (userRequest.getPassword() != null && !userRequest.getPassword().isBlank()) {
-//            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-//        }
-
         helperMethods.updateUserFromRequest(userRequest, user);
-
         User updatedUser = userRepository.save(user);
 
         return ResponseMessage.<UserResponse>builder()
@@ -105,9 +92,9 @@ public class UserService {
                 .build();
     }
 
-    // !!! 5) deleteUser (Kullanıcı silme)
+    // !!! 5) deleteUserById (Kullanıcı silme)
     @Transactional
-    public ResponseMessage<UserResponse> deleteUserById(Long id){
+    public ResponseMessage<UserResponse> deleteUserById(Long id) {
         helperMethods.getByIdUser(id);
         userRepository.deleteById(id);
 
@@ -117,10 +104,4 @@ public class UserService {
                 .object(null)
                 .build();
     }
-
-    public User getUserByIdEntity(Long id){
-        return userRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, id)));
-    }
-
 }

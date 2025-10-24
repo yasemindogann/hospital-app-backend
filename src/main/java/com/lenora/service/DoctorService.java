@@ -3,20 +3,18 @@ package com.lenora.service;
 import com.lenora.entity.concretes.Doctor;
 import com.lenora.entity.concretes.User;
 import com.lenora.exception.ConflictException;
-import com.lenora.exception.ResourceNotFoundException;
 import com.lenora.payload.mapper.DoctorMapper;
 import com.lenora.payload.messages.ErrorMessages;
 import com.lenora.payload.messages.SuccessMessages;
 import com.lenora.payload.request.DoctorRequest;
 import com.lenora.payload.response.DoctorResponse;
 import com.lenora.payload.response.ResponseMessage;
-import com.lenora.payload.response.UserResponse;
 import com.lenora.repository.DoctorRepository;
-import com.lenora.repository.UserRepository;
 import com.lenora.service.helper.HelperMethods;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,24 +28,22 @@ public class DoctorService {
     private final HelperMethods helperMethods;
 
     // !!! 1) saveDoctor (Yeni doktor oluşturma)
-    public ResponseMessage<DoctorResponse> saveDoctor(DoctorRequest doctorRequest){
+    @Transactional
+    public ResponseMessage<DoctorResponse> saveDoctor(DoctorRequest doctorRequest) {
 
-        User user = userService.getUserByIdEntity(doctorRequest.getUserId());
+        // İlgili user var mı?
+        User user = helperMethods.getByIdUser(doctorRequest.getUserId());
 
-        // User'ın rolünü kontrol et
-        if(!user.getRole().name().equalsIgnoreCase("DOCTOR")){
-            throw new ConflictException(String.format(ErrorMessages.USER_ROLE_NOT_DOCTOR , user.getId()));
-        }
+        // Kullanıcının rolü DOCTOR mu ve zaten doktor olarak kayıtlı mı?
+        helperMethods.validateDoctorCreation(user);
 
-        // Bu user zaten bir doktorsa, ikinci kez eklenmesin
-        if(doctorRepository.existsByUserId(user.getId())){
-            throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_REGISTERED_AS_DOCTOR, user.getId()));
-        }
-
+        // Yeni doktor nesnesini oluştur
         Doctor doctor = doctorMapper.doctorRequestToDoctor(doctorRequest, user);
 
+        // DB'ye kaydet
         Doctor savedDoctor = doctorRepository.save(doctor);
 
+        // Response oluştur
         return ResponseMessage.<DoctorResponse>builder()
                 .message(SuccessMessages.DOCTOR_CREATED_SUCCESSFULY)
                 .httpStatus(HttpStatus.CREATED)
@@ -55,8 +51,8 @@ public class DoctorService {
                 .build();
     }
 
-    // !!! 2) getAllDoctors (Bütün doktorları getir)
-    public ResponseMessage<List<DoctorResponse>> getAllDoctorsWithList(){
+    // !!! 2) getAllDoctorsWithList (Bütün doktorları getir)
+    public ResponseMessage<List<DoctorResponse>> getAllDoctorsWithList() {
 
         List<Doctor> doctors = doctorRepository.findAll();
 
@@ -71,8 +67,8 @@ public class DoctorService {
                 .build();
     }
 
-    // !!! 3) getDoctorById (İstenilen id'li doktoru getir)
-    public ResponseMessage<DoctorResponse> getDoctorById(Long id){
+    // !!! 3) getDoctorById (İstenilen id'li doktor'u getir)
+    public ResponseMessage<DoctorResponse> getDoctorById(Long id) {
         Doctor doctor = helperMethods.getByIdDoctor(id);
 
         return ResponseMessage.<DoctorResponse>builder()
@@ -83,14 +79,52 @@ public class DoctorService {
     }
 
     // !!! 4) updateDoctorById (Doktor güncelleme)
+    @Transactional
     public ResponseMessage<DoctorResponse> updateDoctorById(Long id, DoctorRequest doctorRequest) {
+
+        // Güncellenecek doktor var mı?
         Doctor doctor = helperMethods.getByIdDoctor(id);
 
-        if( ){
+        // Yeni user bilgisi (update edilecek user değişmiş olabilir)
+        User user = helperMethods.getByIdUser(doctorRequest.getUserId());
 
+        // Kullanıcı DOCTOR rolünde mi?
+        helperMethods.validateUserIsDoctor(user);
+
+        // Aynı user başka bir doktora ait mi?
+        if (doctorRepository.existsByUserId(user.getId()) &&
+                !doctor.getUser().getId().equals(user.getId())) {
+            throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_REGISTERED_AS_DOCTOR, user.getId()));
         }
 
+        // Doktor nesnesini güncelle
+        helperMethods.updateDoctorFromRequest(doctorRequest, doctor, user);
+
+        // DB'ye kaydet
+        Doctor updatedDoctor = doctorRepository.save(doctor);
+
+        // Response döndür
+        return ResponseMessage.<DoctorResponse>builder()
+                .message(SuccessMessages.DOCTOR_UPDATED_SUCCESSFULY)
+                .httpStatus(HttpStatus.OK)
+                .object(doctorMapper.doctorToDoctorResponse(updatedDoctor))
+                .build();
+    }
+
+    // !!! 4) deleteDoctorById
+    @Transactional
+    public ResponseMessage<DoctorResponse> deleteDoctorById(Long id){
+
+        helperMethods.getByIdDoctor(id);
+        doctorRepository.deleteById(id);
+
+        return ResponseMessage.<DoctorResponse>builder()
+                .message(SuccessMessages.DOCTOR_DELETED_SUCCESSFULY)
+                .httpStatus(HttpStatus.OK)
+                .object(null)
+                .build();
     }
 
 
 }
+

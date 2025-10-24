@@ -46,6 +46,11 @@ public class DoctorController {
         return ResponseEntity.ok(doctorService.updateDoctorById(id, doctorRequest));
     }
 
+    // !!! 4) deleteDoctorById (Doktor silme)
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseMessage<DoctorResponse>> deleteDoctorById(@PathVariable Long id){
+        return ResponseEntity.ok(doctorService.deleteDoctorById(id));
+    }
 
 
 }
