@@ -1,6 +1,7 @@
 package com.lenora.service;
 
 import com.lenora.entity.concretes.User;
+import com.lenora.entity.enums.Role;
 import com.lenora.exception.ConflictException;
 import com.lenora.payload.mapper.UserMapper;
 import com.lenora.payload.messages.ErrorMessages;
@@ -82,6 +83,12 @@ public class UserService {
             throw new ConflictException(
                     String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName())
             );
+        }
+
+        //Rolü DOCTOR olan bir User update ile ADMIN olamasın
+        // Eğer bu kullanıcı zaten doktor tablosunda varsa (yani bir doktor kayıtlıysa)
+        if (doctorRepository.existsByUserId(user.getId()) && userRequest.getRole() != Role.DOCTOR) {
+            throw new ConflictException(String.format(ErrorMessages.CANNOT_CHANGE_ROLE_OF_DOCTOR, user.getId()));
         }
 
         userMapper.updateUserFromRequest(userRequest, user);
