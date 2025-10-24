@@ -1,18 +1,15 @@
 package com.lenora.service.helper;
 
-import com.lenora.entity.concretes.Doctor;
-import com.lenora.entity.concretes.Patient;
-import com.lenora.entity.concretes.User;
+import com.lenora.entity.concretes.user.Doctor;
+import com.lenora.entity.concretes.user.Patient;
+import com.lenora.entity.concretes.user.User;
 import com.lenora.entity.enums.Role;
 import com.lenora.exception.ConflictException;
 import com.lenora.exception.ResourceNotFoundException;
 import com.lenora.payload.messages.ErrorMessages;
-import com.lenora.payload.request.DoctorRequest;
-import com.lenora.payload.request.PatientRequest;
-import com.lenora.payload.request.UserRequest;
-import com.lenora.repository.DoctorRepository;
-import com.lenora.repository.PatientRepository;
-import com.lenora.repository.UserRepository;
+import com.lenora.repository.user.DoctorRepository;
+import com.lenora.repository.user.PatientRepository;
+import com.lenora.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
