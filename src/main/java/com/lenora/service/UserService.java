@@ -8,8 +8,9 @@ import com.lenora.payload.messages.SuccessMessages;
 import com.lenora.payload.request.UserRequest;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.payload.response.UserResponse;
+import com.lenora.repository.DoctorRepository;
 import com.lenora.repository.UserRepository;
-import com.lenora.service.helper.HelperMethods;
+import com.lenora.service.helper.MethodHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,12 +24,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final HelperMethods helperMethods;
+    private final MethodHelper methodHelper;
+    private final DoctorRepository doctorRepository;
 
     // !!! 1) saveUser (Yeni kullanıcı oluşturma)
     @Transactional
     public ResponseMessage<UserResponse> saveUser(UserRequest userRequest) {
-        if (helperMethods.checkUserNameExists(userRequest.getUserName())) {
+        if (methodHelper.checkUserNameExists(userRequest.getUserName())) {
             throw new ConflictException(
                     String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName())
             );
@@ -60,7 +62,7 @@ public class UserService {
 
     // !!! 3) getUserById (İstenilen id'li kullanıcıyı getir)
     public ResponseMessage<UserResponse> getUserById(Long id) {
-        User user = helperMethods.getByIdUser(id);
+        User user = methodHelper.getByIdUser(id);
 
         return ResponseMessage.<UserResponse>builder()
                 .message(SuccessMessages.USER_FOUNDED_SUCCESSFULY)
@@ -72,17 +74,17 @@ public class UserService {
     // !!! 4) updateUserById (Kullanıcı güncelleme)
     @Transactional
     public ResponseMessage<UserResponse> updateUserById(Long id, UserRequest userRequest) {
-        User user = helperMethods.getByIdUser(id);
+        User user = methodHelper.getByIdUser(id);
 
         // Username başka kullanıcıda varsa hata
         if (!user.getUserName().equalsIgnoreCase(userRequest.getUserName()) &&
-                helperMethods.checkUserNameExists(userRequest.getUserName())) {
+                methodHelper.checkUserNameExists(userRequest.getUserName())) {
             throw new ConflictException(
                     String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName())
             );
         }
 
-        helperMethods.updateUserFromRequest(userRequest, user);
+        userMapper.updateUserFromRequest(userRequest, user);
         User updatedUser = userRepository.save(user);
 
         return ResponseMessage.<UserResponse>builder()
@@ -94,9 +96,15 @@ public class UserService {
 
     // !!! 5) deleteUserById (Kullanıcı silme)
     @Transactional
-    public ResponseMessage<UserResponse> deleteUserById(Long id) {
-        helperMethods.getByIdUser(id);
-        userRepository.deleteById(id);
+    public ResponseMessage<UserResponse> deleteUser(Long id) {
+        User user = methodHelper.getByIdUser(id);
+
+        // Eğer user bir doktorsa, ona bağlı doktor kaydını sil
+        doctorRepository.findByUserId(user.getId())
+                .ifPresent(doctorRepository::delete); //ifPresent -> değer varsa sil, yoksa hiçbir şey yapma
+
+        // Entity üzerinden silmek, JPA ilişkilerini (örneğin Doctor) doğru şekilde yönetir
+        userRepository.delete(user);
 
         return ResponseMessage.<UserResponse>builder()
                 .message(SuccessMessages.USER_DELETED_SUCCESSFULY)

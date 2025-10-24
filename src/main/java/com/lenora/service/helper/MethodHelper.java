@@ -1,24 +1,28 @@
 package com.lenora.service.helper;
 
 import com.lenora.entity.concretes.Doctor;
+import com.lenora.entity.concretes.Patient;
 import com.lenora.entity.concretes.User;
 import com.lenora.entity.enums.Role;
 import com.lenora.exception.ConflictException;
 import com.lenora.exception.ResourceNotFoundException;
 import com.lenora.payload.messages.ErrorMessages;
 import com.lenora.payload.request.DoctorRequest;
+import com.lenora.payload.request.PatientRequest;
 import com.lenora.payload.request.UserRequest;
 import com.lenora.repository.DoctorRepository;
+import com.lenora.repository.PatientRepository;
 import com.lenora.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class HelperMethods {
+public class MethodHelper {
 
     private final UserRepository userRepository;
     private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
 
     // userName ile unique kontrolü — Bu userName zaten var mı?
     public boolean checkUserNameExists(String userName) {
@@ -52,19 +56,10 @@ public class HelperMethods {
         }
     }
 
-    // User update işlemi için UserRequest → User mapping
-    public void updateUserFromRequest(UserRequest userRequest, User user) {
-        user.setUserName(userRequest.getUserName());
-        user.setEmail(userRequest.getEmail());
-        user.setRole(userRequest.getRole());
-        user.setActive(userRequest.getActive());
+    // Patient ID ile getir — yoksa hata fırlat
+    public Patient getByIdPatient(Long id){
+        return patientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.PATIENT_NOT_FOUND, id)));
     }
 
-    // Doctor update işlemi için DoctorRequest → Doctor mapping
-    public void updateDoctorFromRequest(DoctorRequest doctorRequest, Doctor doctor, User user) {
-        doctor.setFullName(doctorRequest.getFullName());
-        doctor.setSpecialization(doctorRequest.getSpecialization());
-        doctor.setPhone(doctorRequest.getPhone());
-        doctor.setUser(user);
-    }
 }

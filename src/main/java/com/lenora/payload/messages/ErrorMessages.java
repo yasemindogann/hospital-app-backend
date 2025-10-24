@@ -9,4 +9,7 @@ public class ErrorMessages {
     public static final String USER_ROLE_NOT_DOCTOR  = "User with ID %d does not have DOCTOR role. Only users with DOCTOR role can be registered as doctors.";
 
     public static final String USER_ALREADY_REGISTERED_AS_DOCTOR = "User with ID %d is already registered as a doctor.";
+
+    public static final String PATIENT_NOT_FOUND = "Patient not found with id: %s";
+
 }

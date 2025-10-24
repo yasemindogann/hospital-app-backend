@@ -30,4 +30,12 @@ public class DoctorMapper {
                 .build();
     }
 
+    // Doctor update işlemi için DoctorRequest → Doctor mapping
+    public void updateDoctorFromRequest(DoctorRequest doctorRequest, Doctor doctor, User user) {
+        doctor.setFullName(doctorRequest.getFullName());
+        doctor.setSpecialization(doctorRequest.getSpecialization());
+        doctor.setPhone(doctorRequest.getPhone());
+        doctor.setUser(user);
+    }
+
 }

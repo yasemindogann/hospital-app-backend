@@ -33,4 +33,18 @@ public class UserMapper {
                 .createdDateTime(user.getCreatedDateTime())
                 .build();
     }
+
+    // 🔹 Entity -> Request mapping (Update için)
+    public void updateUserFromRequest(UserRequest userRequest, User user) {
+        user.setUserName(userRequest.getUserName());
+        user.setEmail(userRequest.getEmail());
+        user.setRole(userRequest.getRole());
+        user.setActive(userRequest.getActive());
+//      user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+
+        // Password değiştirilirse burada kontrol edilecek
+        // if (userRequest.getPassword() != null && !userRequest.getPassword().isBlank()) {
+        //     user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+        // }
+    }
 }

@@ -30,4 +30,12 @@ public class PatientMapper {
                 .build();
     }
 
+    // Patient update işlemi için PatientRequest → Patient mapping
+    public void updatePatientFromRequest(PatientRequest patientRequest, Patient patient){
+        patient.setFullName(patientRequest.getFullName());
+        patient.setIdentityNumber(patientRequest.getIdentityNumber());
+        patient.setBirthDate(patientRequest.getBirthDate());
+        patient.setPhone(patientRequest.getPhone());
+    }
+
 }

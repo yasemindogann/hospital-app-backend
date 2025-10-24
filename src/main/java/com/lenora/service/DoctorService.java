@@ -10,7 +10,7 @@ import com.lenora.payload.request.DoctorRequest;
 import com.lenora.payload.response.DoctorResponse;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.repository.DoctorRepository;
-import com.lenora.service.helper.HelperMethods;
+import com.lenora.service.helper.MethodHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,17 +25,17 @@ public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final DoctorMapper doctorMapper;
     private final UserService userService;
-    private final HelperMethods helperMethods;
+    private final MethodHelper methodHelper;
 
     // !!! 1) saveDoctor (Yeni doktor oluşturma)
     @Transactional
     public ResponseMessage<DoctorResponse> saveDoctor(DoctorRequest doctorRequest) {
 
         // İlgili user var mı?
-        User user = helperMethods.getByIdUser(doctorRequest.getUserId());
+        User user = methodHelper.getByIdUser(doctorRequest.getUserId());
 
         // Kullanıcının rolü DOCTOR mu ve zaten doktor olarak kayıtlı mı?
-        helperMethods.validateDoctorCreation(user);
+        methodHelper.validateDoctorCreation(user);
 
         // Yeni doktor nesnesini oluştur
         Doctor doctor = doctorMapper.doctorRequestToDoctor(doctorRequest, user);
@@ -69,7 +69,7 @@ public class DoctorService {
 
     // !!! 3) getDoctorById (İstenilen id'li doktor'u getir)
     public ResponseMessage<DoctorResponse> getDoctorById(Long id) {
-        Doctor doctor = helperMethods.getByIdDoctor(id);
+        Doctor doctor = methodHelper.getByIdDoctor(id);
 
         return ResponseMessage.<DoctorResponse>builder()
                 .message(SuccessMessages.DOCTOR_FOUNDED_SUCCESSFULY)
@@ -83,22 +83,23 @@ public class DoctorService {
     public ResponseMessage<DoctorResponse> updateDoctorById(Long id, DoctorRequest doctorRequest) {
 
         // Güncellenecek doktor var mı?
-        Doctor doctor = helperMethods.getByIdDoctor(id);
+        Doctor doctor = methodHelper.getByIdDoctor(id);
 
-        // Yeni user bilgisi (update edilecek user değişmiş olabilir)
-        User user = helperMethods.getByIdUser(doctorRequest.getUserId());
+        // Yeni user bilgisi (Başka bir userId'ye kaydetmek istiyor olabilir.O id'li User var mı)
+        User user = methodHelper.getByIdUser(doctorRequest.getUserId());
 
         // Kullanıcı DOCTOR rolünde mi?
-        helperMethods.validateUserIsDoctor(user);
+        methodHelper.validateUserIsDoctor(user);
 
         // Aynı user başka bir doktora ait mi?
-        if (doctorRepository.existsByUserId(user.getId()) &&
-                !doctor.getUser().getId().equals(user.getId())) {
-            throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_REGISTERED_AS_DOCTOR, user.getId()));
-        }
+        doctorRepository.findByUserId(user.getId())
+                .filter(existingDoctor -> !existingDoctor.getId().equals(doctor.getId()))
+                .ifPresent(existingDoctor -> {
+                    throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_REGISTERED_AS_DOCTOR, user.getId()));
+                });
 
         // Doktor nesnesini güncelle
-        helperMethods.updateDoctorFromRequest(doctorRequest, doctor, user);
+        doctorMapper.updateDoctorFromRequest(doctorRequest, doctor, user);
 
         // DB'ye kaydet
         Doctor updatedDoctor = doctorRepository.save(doctor);
@@ -115,8 +116,8 @@ public class DoctorService {
     @Transactional
     public ResponseMessage<DoctorResponse> deleteDoctorById(Long id){
 
-        helperMethods.getByIdDoctor(id);
-        doctorRepository.deleteById(id);
+        Doctor doctor = methodHelper.getByIdDoctor(id);
+        doctorRepository.delete(doctor);
 
         return ResponseMessage.<DoctorResponse>builder()
                 .message(SuccessMessages.DOCTOR_DELETED_SUCCESSFULY)
