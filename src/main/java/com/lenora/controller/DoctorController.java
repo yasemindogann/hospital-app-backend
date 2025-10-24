@@ -21,23 +21,29 @@ public class DoctorController {
 
     private final DoctorService doctorService;
 
-    // !!! 1) saveDoctor (Yeni kullanıcı oluşturma)
+    // !!! 1) saveDoctor (Yeni doktor oluşturma)
     @PostMapping
     public ResponseEntity<ResponseMessage<DoctorResponse>> saveDoctor(@Valid @RequestBody DoctorRequest doctorRequest){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(doctorService.saveDoctor(doctorRequest));
     }
 
-    // !!! 2) getAllDoctors (Bütün doktorları getir)
+    // !!! 2) getAllDoctorsWithList (Bütün doktorları getir)
     @GetMapping
-    public ResponseEntity<ResponseMessage<List<DoctorResponse>>> getAllDoctors(){
-        return ResponseEntity.ok(doctorService.getAllDoctors());
+    public ResponseEntity<ResponseMessage<List<DoctorResponse>>> getAllDoctorsWithList(){
+        return ResponseEntity.ok(doctorService.getAllDoctorsWithList());
     }
 
     // !!! 3) getDoctorById (İstenilen id'li doktoru getir)
     @GetMapping("/{id}")
     public ResponseEntity<ResponseMessage<DoctorResponse>> getDoctorById(@PathVariable Long id){
         return ResponseEntity.ok(doctorService.getDoctorById(id));
+    }
+
+    // !!! 4) updateDoctorById (Doktor güncelleme)
+    @PutMapping("/{id}")
+    public ResponseEntity<ResponseMessage<DoctorResponse>> updateDoctorById(@PathVariable Long id, @Valid @RequestBody DoctorRequest doctorRequest){
+        return ResponseEntity.ok(doctorService.updateDoctorById(id, doctorRequest));
     }
 
 

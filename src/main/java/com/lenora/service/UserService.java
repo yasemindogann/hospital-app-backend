@@ -49,8 +49,8 @@ public class UserService {
                 .build();
     }
 
-    // !!! 2) getAllUser (Tüm kullanıcıları getir)
-    public ResponseMessage<List<UserResponse>> getAllUsers(){
+    // !!! 2) getAllUserWithList (Tüm kullanıcıları getir)
+    public ResponseMessage<List<UserResponse>> getAllUserWithList(){
         List<User> users = userRepository.findAll();
 
         List<UserResponse> userList = users.stream()
@@ -79,7 +79,7 @@ public class UserService {
 
     // !!! 4) updateUser (Kullanıcı güncelleme)
     @Transactional //method çalışırken exception olursa DB değişiklikleri otomatik geri alınır (rollback)
-    public ResponseMessage<UserResponse> updateUser(Long id, UserRequest userRequest){
+    public ResponseMessage<UserResponse> updateUserById(Long id, UserRequest userRequest){
         //güncellenmek istenilen kullanıcı DB'de var mı
         User user = helperMethods.getByIdUser(id);
 
@@ -107,12 +107,9 @@ public class UserService {
 
     // !!! 5) deleteUser (Kullanıcı silme)
     @Transactional
-    public ResponseMessage<UserResponse> deleteUser(Long id){
-        User user = helperMethods.getByIdUser(id);
+    public ResponseMessage<UserResponse> deleteUserById(Long id){
+        helperMethods.getByIdUser(id);
         userRepository.deleteById(id);
-
-        //User user = helperMethods.getById(id);
-        //userRepository.delete(user);
 
         return ResponseMessage.<UserResponse>builder()
                 .message(SuccessMessages.USER_DELETED_SUCCESSFULY)

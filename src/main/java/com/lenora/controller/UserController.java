@@ -27,28 +27,28 @@ public class UserController {
                 .body(userService.saveUser(userRequest));
     }
 
-    // !!! 2) getAllUser (Tüm kullanıcıları getir)
+    // !!! 2) getAllUserWithList (Tüm kullanıcıları getir)
     @GetMapping
-    public ResponseEntity<ResponseMessage<List<UserResponse>>> getAllUsers(){
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<ResponseMessage<List<UserResponse>>> getAllUserWithList(){
+        return ResponseEntity.ok(userService.getAllUserWithList());
     }
 
-    // !!! 3) getById (İstenilen id'li kullanıcıyı getir)
+    // !!! 3) getUserById (İstenilen id'li kullanıcıyı getir)
     @GetMapping("/{id}")
     public ResponseEntity<ResponseMessage<UserResponse>> getUserById(@PathVariable Long id){
         return ResponseEntity.ok(userService.getUserById(id));
     }
 
-    // !!! 4) updateUser (Kullanıcı güncelleme)
+    // !!! 4) updateUserById (Kullanıcı güncelleme)
     @PutMapping("/{id}")
-    public ResponseEntity<ResponseMessage<UserResponse>> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequest userRequest){
-        return ResponseEntity.ok(userService.updateUser(id, userRequest));
+    public ResponseEntity<ResponseMessage<UserResponse>> updateUserById(@PathVariable Long id, @Valid @RequestBody UserRequest userRequest){
+        return ResponseEntity.ok(userService.updateUserById(id, userRequest));
     }
 
-    // !!! 5) deleteUser (Kullanıcı silme)
+    // !!! 5) deleteUserById (Kullanıcı silme)
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseMessage<UserResponse>> deleteUser(@PathVariable Long id){
-        return ResponseEntity.ok(userService.deleteUser(id));
+    public ResponseEntity<ResponseMessage<UserResponse>> deleteUserById(@PathVariable Long id){
+        return ResponseEntity.ok(userService.deleteUserById(id));
     }
 
 

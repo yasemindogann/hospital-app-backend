@@ -29,7 +29,7 @@ public class DoctorService {
     private final UserService userService;
     private final HelperMethods helperMethods;
 
-    // !!! 1) saveDoctor (Yeni kullanıcı oluşturma)
+    // !!! 1) saveDoctor (Yeni doktor oluşturma)
     public ResponseMessage<DoctorResponse> saveDoctor(DoctorRequest doctorRequest){
 
         User user = userService.getUserByIdEntity(doctorRequest.getUserId());
@@ -56,7 +56,7 @@ public class DoctorService {
     }
 
     // !!! 2) getAllDoctors (Bütün doktorları getir)
-    public ResponseMessage<List<DoctorResponse>> getAllDoctors(){
+    public ResponseMessage<List<DoctorResponse>> getAllDoctorsWithList(){
 
         List<Doctor> doctors = doctorRepository.findAll();
 
@@ -82,6 +82,15 @@ public class DoctorService {
                 .build();
     }
 
+    // !!! 4) updateDoctorById (Doktor güncelleme)
+    public ResponseMessage<DoctorResponse> updateDoctorById(Long id, DoctorRequest doctorRequest) {
+        Doctor doctor = helperMethods.getByIdDoctor(id);
+
+        if( ){
+
+        }
+
+    }
 
 
 }

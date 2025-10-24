@@ -22,7 +22,7 @@ public class HelperMethods {
         return userRepository.existsByUserNameIgnoreCase(userName);
     }
 
-    //getById için ayrı bir method oluşturduk.Update delete için de kullanılır.
+    //User için -> getById için ayrı bir method oluşturduk.Update delete için de kullanılır.
     public User getByIdUser(Long id){
         return userRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, id)));
@@ -36,6 +36,7 @@ public class HelperMethods {
         user.setActive(userRequest.getActive());
     }
 
+    //Doktor için -> getById için ayrı bir method oluşturduk.Update delete için de kullanılır.
     public Doctor getByIdDoctor(Long id){
         return doctorRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessages.DOCTOR_NOT_FOUND, id)));
