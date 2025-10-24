@@ -5,6 +5,8 @@ public class SuccessMessages {
     private SuccessMessages() {}
 
     public static final String USER_CREATED_SUCCESSFULY = "User created successfully";
+    public static final String USER_LISTED_SUCCESSFULY = "User listed successfully";
+    public static final String USER_FOUNDED_SUCCESSFULY = "User founded successfully";
     public static final String USER_UPDATED_SUCCESSFULY = "User updated successfully";
     public static final String USER_DELETED_SUCCESSFULY = "User deleted successfully";
 

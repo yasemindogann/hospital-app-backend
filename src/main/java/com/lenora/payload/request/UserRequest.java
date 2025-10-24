@@ -26,6 +26,9 @@ public class UserRequest {
     @Email(message = "Invalid email format")
     private String email;
 
+    @NotNull(message = "Active is required")
+    private Boolean active;
+
     @NotNull(message = "Role is required")
     private Role role;
 }

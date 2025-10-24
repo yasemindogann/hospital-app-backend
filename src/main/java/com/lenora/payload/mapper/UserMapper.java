@@ -17,11 +17,10 @@ public class UserMapper {
                 .password(userRequest.getPassword())
                 .email(userRequest.getEmail())
                 .role(userRequest.getRole())
-                .active(true)
+                .active(userRequest.getActive())
                 .createdDateTime(LocalDateTime.now())
                 .build();
     }
-
 
     // 🔹 Entity -> Response
     public UserResponse userToUserResponse(User user){
@@ -34,5 +33,4 @@ public class UserMapper {
                 .createdDateTime(user.getCreatedDateTime())
                 .build();
     }
-
 }

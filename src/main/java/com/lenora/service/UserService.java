@@ -9,9 +9,13 @@ import com.lenora.payload.request.UserRequest;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.payload.response.UserResponse;
 import com.lenora.repository.UserRepository;
+import com.lenora.service.helper.HelperMethods;
 import lombok.RequiredArgsConstructor;;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +23,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final HelperMethods helperMethods;
 
 
     // !!! 1) saveUser (Yeni kullanıcı oluşturma)
+    @Transactional
     public ResponseMessage<UserResponse> saveUser(UserRequest userRequest){
+
         //Bu username ile kayıtlı kullanıcı var mı kontrolü
-        //Varsa bu kullanıcı adı ile kayıtlı user var diye mesaj verecek, yoksa bir şey yapmayacak
-        checkUserNameExists(userRequest.getUserName());
+        if(helperMethods.checkUserNameExists(userRequest.getUserName())){
+            throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName()));
+        }
 
         //userRequest'i User'a çevirdi
         User user = userMapper.userRequestToUser(userRequest);
@@ -40,12 +48,75 @@ public class UserService {
                 .build();
     }
 
-    // userName ile unique kontrolü.Bu userName ile kullanıcı var mı?
-    //Varsa bu username ile kayıtlı kullanıcı var diyecek yoksa bir şey yapmayacak.
-    public void checkUserNameExists(String userName){
-        if(userRepository.existsByUserNameIgnoreCase(userName))
-            throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_EXISTS, userName));
+    // !!! 2) getAllUser (Tüm kullanıcıları getir)
+    public ResponseMessage<List<UserResponse>> getAllUsers(){
+        List<User> users = userRepository.findAll();
+
+        List<UserResponse> responseList = users.stream()
+                .map(userMapper::userToUserResponse)
+                .toList();
+        return ResponseMessage.<List<UserResponse>>builder()
+                .message(SuccessMessages.USER_LISTED_SUCCESSFULY)
+                .httpStatus(HttpStatus.OK)
+                .object(responseList)
+                .build();
+
     }
 
+    // !!! 3) getById (İstenilen id'li kullanıcıyı getir)
+    public ResponseMessage<UserResponse> getUserById(Long id){
+        User user = helperMethods.getById(id);
+
+        return ResponseMessage.<UserResponse>builder()
+                .message(SuccessMessages.USER_FOUNDED_SUCCESSFULY)
+                .httpStatus(HttpStatus.OK)
+                .object(userMapper.userToUserResponse(user))
+                .build();
+
+    }
+
+    // !!! 4) updateUser (Kullanıcı güncelleme)
+    @Transactional //method çalışırken exception olursa DB değişiklikleri otomatik geri alınır (rollback)
+    public ResponseMessage<UserResponse> updateUser(Long id, UserRequest userRequest){
+        //güncellenmek istenilen kullanıcı DB'de var mı
+        User user = helperMethods.getById(id);
+
+        //Username değişmişse ve başka bir kullanıcıda varsa hata fırlat
+        if (!user.getUserName().equalsIgnoreCase(userRequest.getUserName()) &&
+                helperMethods.checkUserNameExists(userRequest.getUserName())) {
+            throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName()));
+        }
+
+//        // Password boş değilse veya null değilse encode et
+//        if (userRequest.getPassword() != null && !userRequest.getPassword().isBlank()) {
+//            user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+//        }
+
+        helperMethods.updateUserFromRequest(userRequest, user);
+
+        User updatedUser = userRepository.save(user);
+
+        return ResponseMessage.<UserResponse>builder()
+                .message(SuccessMessages.USER_UPDATED_SUCCESSFULY)
+                .httpStatus(HttpStatus.OK)
+                .object(userMapper.userToUserResponse(updatedUser))
+                .build();
+    }
+
+    // !!! 5) deleteUser (Kullanıcı silme)
+    @Transactional
+    public ResponseMessage<UserResponse> deleteUser(Long id){
+        User user = helperMethods.getById(id);
+        userRepository.deleteById(id);
+
+        //User user = helperMethods.getById(id);
+        //userRepository.delete(user);
+
+        return ResponseMessage.<UserResponse>builder()
+                .message(SuccessMessages.USER_DELETED_SUCCESSFULY)
+                .httpStatus(HttpStatus.OK)
+                .object(null)
+                .build();
+    }
 
 }
