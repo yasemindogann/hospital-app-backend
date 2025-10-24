@@ -23,7 +23,6 @@ public class Doctor {
     @Enumerated(EnumType.STRING)
     private Specialization specialization;
 
-    @Column(unique = true)
     private String phone;
 
     //DB'de Long

@@ -2,6 +2,7 @@ package com.lenora.service;
 
 import com.lenora.entity.concretes.User;
 import com.lenora.exception.ConflictException;
+import com.lenora.exception.ResourceNotFoundException;
 import com.lenora.payload.mapper.UserMapper;
 import com.lenora.payload.messages.ErrorMessages;
 import com.lenora.payload.messages.SuccessMessages;
@@ -52,20 +53,21 @@ public class UserService {
     public ResponseMessage<List<UserResponse>> getAllUsers(){
         List<User> users = userRepository.findAll();
 
-        List<UserResponse> responseList = users.stream()
+        List<UserResponse> userList = users.stream()
                 .map(userMapper::userToUserResponse)
                 .toList();
+
         return ResponseMessage.<List<UserResponse>>builder()
                 .message(SuccessMessages.USER_LISTED_SUCCESSFULY)
                 .httpStatus(HttpStatus.OK)
-                .object(responseList)
+                .object(userList)
                 .build();
 
     }
 
     // !!! 3) getById (İstenilen id'li kullanıcıyı getir)
     public ResponseMessage<UserResponse> getUserById(Long id){
-        User user = helperMethods.getById(id);
+        User user = helperMethods.getByIdUser(id);
 
         return ResponseMessage.<UserResponse>builder()
                 .message(SuccessMessages.USER_FOUNDED_SUCCESSFULY)
@@ -79,7 +81,7 @@ public class UserService {
     @Transactional //method çalışırken exception olursa DB değişiklikleri otomatik geri alınır (rollback)
     public ResponseMessage<UserResponse> updateUser(Long id, UserRequest userRequest){
         //güncellenmek istenilen kullanıcı DB'de var mı
-        User user = helperMethods.getById(id);
+        User user = helperMethods.getByIdUser(id);
 
         //Username değişmişse ve başka bir kullanıcıda varsa hata fırlat
         if (!user.getUserName().equalsIgnoreCase(userRequest.getUserName()) &&
@@ -106,7 +108,7 @@ public class UserService {
     // !!! 5) deleteUser (Kullanıcı silme)
     @Transactional
     public ResponseMessage<UserResponse> deleteUser(Long id){
-        User user = helperMethods.getById(id);
+        User user = helperMethods.getByIdUser(id);
         userRepository.deleteById(id);
 
         //User user = helperMethods.getById(id);
@@ -117,6 +119,11 @@ public class UserService {
                 .httpStatus(HttpStatus.OK)
                 .object(null)
                 .build();
+    }
+
+    public User getUserByIdEntity(Long id){
+        return userRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, id)));
     }
 
 }

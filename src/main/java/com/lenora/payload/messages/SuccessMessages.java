@@ -11,6 +11,8 @@ public class SuccessMessages {
     public static final String USER_DELETED_SUCCESSFULY = "User deleted successfully";
 
     public static final String DOCTOR_CREATED_SUCCESSFULY = "Doctor created successfully";
+    public static final String DOCTOR_LISTED_SUCCESSFULY = "Doctor listed successfully";
+    public static final String DOCTOR_FOUNDED_SUCCESSFULY = "Doctor founded successfully";
     public static final String DOCTOR_UPDATED_SUCCESSFULY = "Doctor updated successfully";;
     public static final String DOCTOR_DELETED_SUCCESSFULY = "Doctor deleted successfully";
 
