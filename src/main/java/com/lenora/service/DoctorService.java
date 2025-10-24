@@ -2,6 +2,7 @@ package com.lenora.service;
 
 import com.lenora.entity.concretes.Doctor;
 import com.lenora.entity.concretes.User;
+import com.lenora.exception.ConflictException;
 import com.lenora.exception.ResourceNotFoundException;
 import com.lenora.payload.mapper.DoctorMapper;
 import com.lenora.payload.messages.ErrorMessages;
@@ -32,6 +33,16 @@ public class DoctorService {
     public ResponseMessage<DoctorResponse> saveDoctor(DoctorRequest doctorRequest){
 
         User user = userService.getUserByIdEntity(doctorRequest.getUserId());
+
+        // User'ın rolünü kontrol et
+        if(!user.getRole().name().equalsIgnoreCase("DOCTOR")){
+            throw new ConflictException(String.format(ErrorMessages.USER_ROLE_NOT_DOCTOR , user.getId()));
+        }
+
+        // Bu user zaten bir doktorsa, ikinci kez eklenmesin
+        if(doctorRepository.existsByUserId(user.getId())){
+            throw new ConflictException(String.format(ErrorMessages.USER_ALREADY_REGISTERED_AS_DOCTOR, user.getId()));
+        }
 
         Doctor doctor = doctorMapper.doctorRequestToDoctor(doctorRequest, user);
 
