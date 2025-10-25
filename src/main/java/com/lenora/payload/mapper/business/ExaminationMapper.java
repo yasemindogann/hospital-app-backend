@@ -3,7 +3,9 @@ package com.lenora.payload.mapper.business;
 import com.lenora.entity.concretes.user.Doctor;
 import com.lenora.entity.concretes.business.Examination;
 import com.lenora.entity.concretes.user.Patient;
+import com.lenora.entity.concretes.user.User;
 import com.lenora.payload.request.business.ExaminationRequest;
+import com.lenora.payload.request.user.DoctorRequest;
 import com.lenora.payload.response.business.ExaminationResponse;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +33,12 @@ public class ExaminationMapper {
                 .examinationDateTime(examination.getExaminationDateTime())
                 .examinationDiagnosis(examination.getExaminationDiagnosis())
                 .build();
+    }
+
+    public void updateExaminationFromRequest(ExaminationRequest request, Examination examination, Doctor doctor, Patient patient) {
+        examination.setDoctor(doctor);
+        examination.setPatient(patient);
+        examination.setExaminationDiagnosis(request.getExaminationDiagnosis());
     }
 
 }

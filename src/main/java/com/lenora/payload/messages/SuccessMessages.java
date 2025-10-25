@@ -23,6 +23,8 @@ public class SuccessMessages {
     public static final String PATIENT_DELETED_SUCCESSFULY = "Patient deleted successfully";
 
     public static final String EXAMINATION_CREATED_SUCCESSFULY = "Examination created successfully";
+    public static final String EXAMINATION_LISTED_SUCCESSFULY = "Examination listed successfully";
+    public static final String EXAMINATION_FOUNDED_SUCCESSFULY = "Examination founded successfully";
     public static final String EXAMINATION_UPDATED_SUCCESSFULY = "Examination updated successfully";
     public static final String EXAMINATION_DELETED_SUCCESSFULY = "Examination deleted successfully";
 

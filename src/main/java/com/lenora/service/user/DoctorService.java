@@ -9,6 +9,7 @@ import com.lenora.payload.messages.SuccessMessages;
 import com.lenora.payload.request.user.DoctorRequest;
 import com.lenora.payload.response.user.DoctorResponse;
 import com.lenora.payload.response.ResponseMessage;
+import com.lenora.repository.business.ExaminationRepository;
 import com.lenora.repository.user.DoctorRepository;
 import com.lenora.service.helper.MethodHelper;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class DoctorService {
     private final DoctorMapper doctorMapper;
     private final UserService userService;
     private final MethodHelper methodHelper;
+    private final ExaminationRepository examinationRepository;
 
     // !!! 1) saveDoctor (Yeni doktor oluşturma)
     @Transactional
@@ -112,9 +114,9 @@ public class DoctorService {
                 .build();
     }
 
-    // !!! 4) deleteDoctorById
+    // !!! 5) deleteDoctor
     @Transactional
-    public ResponseMessage<DoctorResponse> deleteDoctorById(Long id){
+    public ResponseMessage<DoctorResponse> deleteDoctor(Long id){
 
         Doctor doctor = methodHelper.getByIdDoctor(id);
         doctorRepository.delete(doctor);
