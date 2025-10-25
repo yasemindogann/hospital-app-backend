@@ -33,4 +33,7 @@ public class Examination {
     private LocalDateTime examinationDateTime; //muayene tarihi
 
     private String examinationDiagnosis; //muayene tanısı
+
+    @Column(nullable = false)
+    private Boolean active = true;
 }

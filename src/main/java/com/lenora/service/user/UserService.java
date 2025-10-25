@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,21 +42,23 @@ public class UserService {
         User savedUser = userRepository.save(user);
 
         return ResponseMessage.<UserResponse>builder()
-                .message(SuccessMessages.USER_CREATED_SUCCESSFULY)
-                .httpStatus(HttpStatus.CREATED)
+                .message(SuccessMessages.USER_CREATED_SUCCESSFULLY)
+                .httpStatus(HttpStatus.CREATED) // 201
                 .object(userMapper.userToUserResponse(savedUser))
                 .build();
     }
 
-    // !!! 2) getAllUserWithList (Tüm kullanıcıları getir)
+    // !!! 2) getAllUserWithList (Aktif kullanıcıları listele)
+    @Transactional(readOnly = true)
     public ResponseMessage<List<UserResponse>> getAllUserWithList() {
-        List<UserResponse> userList = userRepository.findAll()
+
+        List<UserResponse> userList = userRepository.findAllByActiveTrue()
                 .stream()
                 .map(userMapper::userToUserResponse)
-                .toList();
+                .collect(Collectors.toList());
 
         return ResponseMessage.<List<UserResponse>>builder()
-                .message(SuccessMessages.USER_LISTED_SUCCESSFULY)
+                .message(SuccessMessages.USER_LISTED_SUCCESSFULLY)
                 .httpStatus(HttpStatus.OK)
                 .object(userList)
                 .build();
@@ -101,15 +104,41 @@ public class UserService {
                 .build();
     }
 
+    // !!! 5) deleteUserById (Kullanıcı silme)
+    public ResponseMessage<UserResponse> deleteUser(Long id) {
+
+        User user = methodHelper.getByIdUser(id);
+
+        //Soft delete uygula (aktiflik false yapılır)
+        methodHelper.deactivateEntity(user);
+
+        // Eğer user bir doctor’a bağlıysa, onu da pasifleştir
+        doctorRepository.findByUserIdAndActiveTrue(user.getId())
+                .ifPresent(doctor -> methodHelper.deactivateEntity(doctor));
+
+        UserResponse userResponse = userMapper.userToUserResponse(user);
+
+        return ResponseMessage.<UserResponse>builder()
+                .message(SuccessMessages.USER_DELETED_SUCCESSFULLY)
+                .httpStatus(HttpStatus.OK)
+                .object(userResponse)
+                .build();
+    }
+
+
+    // BU ŞEKİLDE USERLARIN DB'DEN SİLİNMESİ TEHLİKELİ OLABİLİR.
+    // GELECEKTE BU VERİLER LAZIM OLACAKTIR.
+    // BU YÜZDEN DELETE İŞLEMİNDE USER'I PASİF YAPMAK DAHA DOĞRU OLACAKTIR DİYE DÜŞÜNDÜM.
+    // SOFT DELETE İŞLEMİ GELİŞTİRİLEBİLİR.
+
 /*
      // !!! 5) deleteUserById (Kullanıcı silme)
     @Transactional
     public ResponseMessage<UserResponse> deleteUser(Long id) {
         User user = methodHelper.getByIdUser(id);
-
+        // Aynı zamanda bir User olan Doctor silme de kontrol edilmeli.
         // Entity üzerinden silmek, JPA ilişkilerini (örneğin Doctor) doğru şekilde yönetir
         userRepository.delete(user);
-
         return ResponseMessage.<UserResponse>builder()
                 .message(SuccessMessages.USER_DELETED_SUCCESSFULY)
                 .httpStatus(HttpStatus.OK)

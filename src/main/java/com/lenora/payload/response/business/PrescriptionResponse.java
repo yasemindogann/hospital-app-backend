@@ -10,16 +10,10 @@ import lombok.*;
 public class PrescriptionResponse {
 
     private Long id;
-
     private Long examinationId;
-
     private String doctorName;
-
     private String patientName;
-
     private String medicineName;
-
     private String dosage;
-
     private String description;
 }

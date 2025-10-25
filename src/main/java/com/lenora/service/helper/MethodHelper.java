@@ -9,7 +9,6 @@ import com.lenora.entity.enums.Role;
 import com.lenora.exception.ConflictException;
 import com.lenora.exception.ResourceNotFoundException;
 import com.lenora.payload.messages.ErrorMessages;
-import com.lenora.payload.request.business.ExaminationRequest;
 import com.lenora.repository.business.ExaminationRepository;
 import com.lenora.repository.business.PrescriptionRepository;
 import com.lenora.repository.user.DoctorRepository;
@@ -17,9 +16,6 @@ import com.lenora.repository.user.PatientRepository;
 import com.lenora.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -31,21 +27,39 @@ public class MethodHelper {
     private final ExaminationRepository examinationRepository;
     private final PrescriptionRepository prescriptionRepository;
 
-    // userName ile unique kontrolü — Bu userName zaten var mı?
-    public boolean checkUserNameExists(String userName) {
-        return userRepository.existsByUserNameIgnoreCase(userName);
-    }
-
-    // User ID ile getir — yoksa hata fırlat
+    // User
     public User getByIdUser(Long id) {
-        return userRepository.findById(id)
+        return userRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.USER_NOT_FOUND, id)));
     }
 
-    // Doctor ID ile getir — yoksa hata fırlat
+    // Doctor
     public Doctor getByIdDoctor(Long id) {
-        return doctorRepository.findById(id)
+        return doctorRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.DOCTOR_NOT_FOUND, id)));
+    }
+
+    // Patient
+    public Patient getByIdPatient(Long id) {
+        return patientRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.PATIENT_NOT_FOUND, id)));
+    }
+
+    // Examination
+    public Examination getByIdExamination(Long id) {
+        return examinationRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.EXAMINATION_NOT_FOUND, id)));
+    }
+
+    // Prescription
+    public Prescription getByIdPrescription(Long id) {
+        return prescriptionRepository.findByIdAndActiveTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.PRESCRIPTION_NOT_FOUND, id)));
+    }
+
+    // userName ile unique kontrolü — Bu userName zaten var mı?
+    public boolean checkUserNameExists(String userName) {
+        return userRepository.existsByUserNameIgnoreCase(userName);
     }
 
     // User rolü DOCTOR değilse hata fırlat
@@ -63,27 +77,31 @@ public class MethodHelper {
         }
     }
 
-    // Patient ID ile getir — yoksa hata fırlat
-    public Patient getByIdPatient(Long id){
-        return patientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format(ErrorMessages.PATIENT_NOT_FOUND, id)));
-    }
-
-    // Examination ID ile getir — yoksa hata fırlat
-    public Examination getByIdExamination(Long id){
-        return examinationRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException(String.format(ErrorMessages.EXAMINATION_NOT_FOUND, id)));
-    }
-
     public boolean isDuplicateDoctorPatient(Examination existing, Doctor doctor, Patient patient) {
         return examinationRepository.existsByDoctorAndPatient(doctor, patient)
                 && !(existing.getDoctor().equals(doctor) && existing.getPatient().equals(patient));
     }
 
-    // Prescription ID ile getir — yoksa hata fırlat
-    public Prescription getByIdPrescription(Long id){
-        return prescriptionRepository.findById(id).orElseThrow(() ->
-                new ResourceNotFoundException(String.format(ErrorMessages.PRESCRIPION_NOT_FOUND, id)));
+    // Generic pasif hale getirme metodu (soft delete)
+    public void deactivateEntity(Object entity) {
+        if (entity instanceof User user) {
+            user.setActive(false);
+            userRepository.save(user);
+        } else if (entity instanceof Doctor doctor) {
+            doctor.setActive(false);
+            doctorRepository.save(doctor);
+        } else if (entity instanceof Patient patient) {
+            patient.setActive(false);
+            patientRepository.save(patient);
+        } else if (entity instanceof Examination examination) {
+            examination.setActive(false);
+            examinationRepository.save(examination);
+        } else if (entity instanceof Prescription prescription) {
+            prescription.setActive(false);
+            prescriptionRepository.save(prescription);
+        } else {
+            throw new IllegalArgumentException("Unsupported entity type for deactivation: " + entity.getClass());
+        }
     }
 
 }

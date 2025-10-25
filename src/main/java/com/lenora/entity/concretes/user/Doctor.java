@@ -30,4 +30,7 @@ public class Doctor {
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")  //foreign key
     private User user;
+
+    @Column(nullable = false)
+    private Boolean active = true;
 }

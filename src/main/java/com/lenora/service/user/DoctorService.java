@@ -1,5 +1,6 @@
 package com.lenora.service.user;
 
+import com.lenora.entity.concretes.business.Examination;
 import com.lenora.entity.concretes.user.Doctor;
 import com.lenora.entity.concretes.user.User;
 import com.lenora.exception.ConflictException;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,9 +28,9 @@ public class DoctorService {
 
     private final DoctorRepository doctorRepository;
     private final DoctorMapper doctorMapper;
-    private final UserService userService;
     private final MethodHelper methodHelper;
     private final ExaminationService examinationService;
+    private final ExaminationRepository examinationRepository;
 
     // !!! 1) saveDoctor (Yeni doktor oluşturma)
     @Transactional
@@ -54,14 +56,14 @@ public class DoctorService {
                 .build();
     }
 
-    // !!! 2) getAllDoctorsWithList (Bütün doktorları getir)
+    // !!! 2) getAllDoctorsWithList (Aktif doktorları listele)
+    @Transactional(readOnly = true)
     public ResponseMessage<List<DoctorResponse>> getAllDoctorsWithList() {
 
-        List<Doctor> doctors = doctorRepository.findAll();
-
-        List<DoctorResponse> doctorList = doctors.stream()
+        List<DoctorResponse> doctorList = doctorRepository.findAllByActiveTrue()
+                .stream()
                 .map(doctorMapper::doctorToDoctorResponse)
-                .toList();
+                .collect(Collectors.toList());
 
         return ResponseMessage.<List<DoctorResponse>>builder()
                 .message(SuccessMessages.DOCTOR_LISTED_SUCCESSFULY)
@@ -112,6 +114,21 @@ public class DoctorService {
                 .message(SuccessMessages.DOCTOR_UPDATED_SUCCESSFULY)
                 .httpStatus(HttpStatus.OK)
                 .object(doctorMapper.doctorToDoctorResponse(updatedDoctor))
+                .build();
+    }
+
+    @Transactional
+    public ResponseMessage<DoctorResponse> deleteDoctor(Long id) {
+        Doctor doctor = methodHelper.getByIdDoctor(id);
+
+        //Soft delete uygula (aktiflik false yapılır)
+        methodHelper.deactivateEntity(doctor);
+        DoctorResponse response = doctorMapper.doctorToDoctorResponse(doctor);
+
+        return ResponseMessage.<DoctorResponse>builder()
+                .message(SuccessMessages.DOCTOR_DELETED_SUCCESSFULLY)
+                .httpStatus(HttpStatus.OK)
+                .object(response)
                 .build();
     }
 

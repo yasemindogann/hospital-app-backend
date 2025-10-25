@@ -27,4 +27,7 @@ public class Prescription {
     private String dosage;
 
     private String description;
+
+    @Column(nullable = false)
+    private Boolean active = true;
 }

@@ -15,6 +15,7 @@ public class PatientMapper {
                 .identityNumber(patientRequest.getIdentityNumber())
                 .birthDate(patientRequest.getBirthDate())
                 .phone(patientRequest.getPhone())
+                .active(true)
                 .build();
     }
 
@@ -27,6 +28,7 @@ public class PatientMapper {
                 .identityNumber(patient.getIdentityNumber())
                 .birthDate(patient.getBirthDate())
                 .phone(patient.getPhone())
+                .active(patient.getActive())
                 .build();
     }
 

@@ -16,6 +16,7 @@ public class DoctorMapper {
                 .specialization(doctorRequest.getSpecialization())
                 .phone(doctorRequest.getPhone())
                 .user(user)
+                .active(true)
                 .build();
     }
 
@@ -27,6 +28,7 @@ public class DoctorMapper {
                 .specialization(doctor.getSpecialization())
                 .phone(doctor.getPhone())
                 .userId(doctor.getUser().getId())
+                .active(doctor.getActive())
                 .build();
     }
 

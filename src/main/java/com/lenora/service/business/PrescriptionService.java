@@ -2,7 +2,9 @@ package com.lenora.service.business;
 
 import com.lenora.entity.concretes.business.Examination;
 import com.lenora.entity.concretes.business.Prescription;
+import com.lenora.exception.ConflictException;
 import com.lenora.payload.mapper.business.PrescriptionMapper;
+import com.lenora.payload.messages.ErrorMessages;
 import com.lenora.payload.messages.SuccessMessages;
 import com.lenora.payload.request.business.PrescriptionRequest;
 import com.lenora.payload.response.ResponseMessage;
@@ -32,6 +34,14 @@ public class PrescriptionService {
 
         //id'sine kaydetmek istediği muayeneyi varsa getir yoksa hata mesajı
         Examination examination = methodHelper.getByIdExamination(prescriptionRequest.getExaminationId());
+
+        //Bu muayeneye ait reçete zaten varsa hata fırlat
+        prescriptionRepository.findByExaminationId(examination.getId())
+                .ifPresent(existing -> {
+                    throw new ConflictException(String.format(
+                            ErrorMessages.PRESCRIPTION_ALREADY_EXISTS_FOR_EXAMINATION, examination.getId()));
+                });
+
         Prescription prescription = prescriptionMapper.prescriptionRequestToPrescription(prescriptionRequest, examination);
 
         Prescription savedPrescription = prescriptionRepository.save(prescription);
@@ -43,10 +53,15 @@ public class PrescriptionService {
                 .build();
     }
 
-    // !!! 2) getAllPrescriptionWithPageable (Bütün EPrescriptionı Pageable yapıda getir)
+    // !!! 2) getAllPrescriptionWithPageable (Sadece aktif Prescriptionları Pageable yapıda getir)
+    @Transactional(readOnly = true)
     public ResponseMessage<Page<PrescriptionResponse>> getAllPrescriptionWithPageable(int page, int size, String sort, String type) {
-        Pageable pageable = pageableHelper.getPageableWithProperties(page,size,sort,type);
-        Page<Prescription> prescriptionPage = prescriptionRepository.findAll(pageable);
+
+        Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
+
+        // Sadece aktif prescription kayıtlarını getir
+        Page<Prescription> prescriptionPage = prescriptionRepository.findByActiveTrue(pageable);
+
         Page<PrescriptionResponse> prescriptionResponsePage = prescriptionPage.map(prescriptionMapper::prescriptionToPrescriptionResponse);
 
         return ResponseMessage.<Page<PrescriptionResponse>>builder()
@@ -85,6 +100,24 @@ public class PrescriptionService {
                 .build();
     }
 
+    @Transactional
+    public ResponseMessage<PrescriptionResponse> deletePrescription(Long id) {
+        Prescription prescription = methodHelper.getByIdPrescription(id);
+
+        //Soft delete uygula (aktiflik false yapılır)
+        methodHelper.deactivateEntity(prescription);
+
+        PrescriptionResponse response = prescriptionMapper.prescriptionToPrescriptionResponse(prescription);
+
+        return ResponseMessage.<PrescriptionResponse>builder()
+                .message(SuccessMessages.PRESCRIPTION_DELETED_SUCCESSFULLY)
+                .httpStatus(HttpStatus.OK)
+                .object(response)
+                .build();
+    }
+
+
+/*
     // !!! 5) deletePrescription (Reçete silme)
     @Transactional
     public ResponseMessage<PrescriptionResponse> deletePrescription(Long id) {
@@ -98,4 +131,5 @@ public class PrescriptionService {
                 .object(null)
                 .build();
     }
+ */
 }

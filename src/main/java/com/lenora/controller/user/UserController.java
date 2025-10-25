@@ -45,12 +45,9 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserById(id, userRequest));
     }
 
-/*
     // !!! 5) deleteUserById (Kullanıcı silme)
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseMessage<UserResponse>> deleteUser(@PathVariable Long id){
         return ResponseEntity.ok(userService.deleteUser(id));
     }
-*/
-
 }

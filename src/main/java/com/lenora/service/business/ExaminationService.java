@@ -57,13 +57,18 @@ public class ExaminationService {
                 .build();
     }
 
-    // !!! 2) getAllExaminationsWithPageable (Bütün Examinationları Pageable yapıda getir)
+    // !!! 2) getAllExaminationsWithPageable (Sadece aktif Examinationları Pageable yapıda getir)
+    @Transactional(readOnly = true)
     public ResponseMessage<Page<ExaminationResponse>> getAllExaminationsWithPageable(int page, int size, String sort, String type) {
 
         Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
-        Page<Examination> examinationPage = examinationRepository.findAll(pageable);
+
+        // Sadece aktif examination kayıtlarını getir
+        Page<Examination> examinationPage = examinationRepository.findByActiveTrue(pageable);
+
         Page<ExaminationResponse> examinationResponsePage = examinationPage.map(examinationMapper::examinationToExaminationResponse);
 
+        // ResponseMessage ile başarılı yanıt dön
         return ResponseMessage.<Page<ExaminationResponse>>builder()
                 .message(SuccessMessages.EXAMINATION_LISTED_SUCCESSFULY)
                 .httpStatus(HttpStatus.OK)
@@ -105,6 +110,22 @@ public class ExaminationService {
                 .message(SuccessMessages.EXAMINATION_UPDATED_SUCCESSFULY)
                 .httpStatus(HttpStatus.OK)
                 .object(examinationMapper.examinationToExaminationResponse(updatedExamination))
+                .build();
+    }
+
+    @Transactional
+    public ResponseMessage<ExaminationResponse> deleteExamination(Long id) {
+        Examination examination = methodHelper.getByIdExamination(id);
+
+        //Soft delete uygula (aktiflik false yapılır)
+        methodHelper.deactivateEntity(examination);
+
+        ExaminationResponse response = examinationMapper.examinationToExaminationResponse(examination);
+
+        return ResponseMessage.<ExaminationResponse>builder()
+                .message(SuccessMessages.EXAMINATION_DELETED_SUCCESSFULLY)
+                .httpStatus(HttpStatus.OK)
+                .object(response)
                 .build();
     }
 

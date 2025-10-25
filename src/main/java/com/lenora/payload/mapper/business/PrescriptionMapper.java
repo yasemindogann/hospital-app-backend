@@ -16,6 +16,7 @@ public class PrescriptionMapper {
                 .medicineName(prescriptionRequest.getMedicineName())
                 .dosage(prescriptionRequest.getDosage())
                 .description(prescriptionRequest.getDescription())
+                .active(true)
                 .build();
     }
 

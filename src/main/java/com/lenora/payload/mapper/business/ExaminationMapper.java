@@ -21,6 +21,7 @@ public class ExaminationMapper {
                 .patient(patient)
                 .examinationDateTime(LocalDateTime.now())
                 .examinationDiagnosis(examinationRequest.getExaminationDiagnosis())
+                .active(true)
                 .build();
     }
 

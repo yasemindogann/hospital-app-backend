@@ -1,5 +1,6 @@
 package com.lenora.service.user;
 
+import com.lenora.entity.concretes.business.Examination;
 import com.lenora.entity.concretes.user.Patient;
 import com.lenora.payload.mapper.user.PatientMapper;
 import com.lenora.payload.messages.SuccessMessages;
@@ -8,6 +9,7 @@ import com.lenora.payload.response.user.PatientResponse;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.repository.business.ExaminationRepository;
 import com.lenora.repository.user.PatientRepository;
+import com.lenora.service.business.ExaminationService;
 import com.lenora.service.helper.MethodHelper;
 import com.lenora.service.helper.PageableHelper;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PatientService {
@@ -25,6 +30,7 @@ public class PatientService {
     private final PatientMapper patientMapper;
     private final PageableHelper pageableHelper;
     private final MethodHelper methodHelper;
+    private final ExaminationService examinationService;
 
 
     // !!! 1) savePatient (Yeni hasta oluşturma)
@@ -44,14 +50,14 @@ public class PatientService {
 
 
     // !!! 2) getAllPatientWithPageable (Yeni hasta oluşturma)
+    @Transactional(readOnly = true)
     public ResponseMessage<Page<PatientResponse>> getAllPatientWithPageable(int page, int size, String sort, String type) {
 
-        Pageable pageable = pageableHelper.getPageableWithProperties(page,size,sort,type);
+        Pageable pageable = pageableHelper.getPageableWithProperties(page, size, sort, type);
 
-        // Veritabanından sayfalı hasta listesi al
-        Page<Patient> patientPage = patientRepository.findAll(pageable);
+        // Sadece aktif hastaları getir
+        Page<Patient> patientPage = patientRepository.findByActiveTrue(pageable);
 
-        // Entity → DTO dönüşümü (stream değil, map fonksiyonu ile)
         Page<PatientResponse> patientResponsePage = patientPage.map(patientMapper::patientToPatientResponse);
 
         // ResponseMessage döndür
@@ -62,8 +68,8 @@ public class PatientService {
                 .build();
     }
 
-    // !!! 3) getPatientByIdWithRequestParam (İstenilen id'li hastayı getir)
-    public ResponseMessage<PatientResponse> getPatientByIdWithRequestParam(Long id) {
+    // !!! 3) getPatientById (İstenilen id'li hastayı getir)
+    public ResponseMessage<PatientResponse> getPatientById(Long id) {
 
         Patient patient = methodHelper.getByIdPatient(id);
 
@@ -85,6 +91,21 @@ public class PatientService {
                 .message(SuccessMessages.PATIENT_UPDATED_SUCCESSFULY)
                 .httpStatus(HttpStatus.OK)
                 .object(patientMapper.patientToPatientResponse(updatedPatient))
+                .build();
+    }
+
+    @Transactional
+    public ResponseMessage<PatientResponse> deletePatient(Long id) {
+        Patient patient = methodHelper.getByIdPatient(id);
+
+        //Soft delete uygula (aktiflik false yapılır)
+        methodHelper.deactivateEntity(patient);
+        PatientResponse response = patientMapper.patientToPatientResponse(patient);
+
+        return ResponseMessage.<PatientResponse>builder()
+                .message(SuccessMessages.PATIENT_DELETED_SUCCESSFULLY)
+                .httpStatus(HttpStatus.OK)
+                .object(response)
                 .build();
     }
 

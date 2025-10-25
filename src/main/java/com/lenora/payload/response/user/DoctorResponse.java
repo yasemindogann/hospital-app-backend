@@ -15,4 +15,5 @@ public class DoctorResponse {
     private Specialization specialization;
     private String phone;
     private Long userId;
+    private Boolean active; // ADMIN görecek
 }

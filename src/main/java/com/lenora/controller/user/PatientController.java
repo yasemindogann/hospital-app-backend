@@ -39,8 +39,8 @@ public class PatientController {
 
     // !!! 3) getPatientByIdWithRequestParam (İstenilen id'li hastayı getir)
     @GetMapping("/{id}")
-    public ResponseEntity<ResponseMessage<PatientResponse>> getPatientByIdWithRequestParam(@PathVariable Long id){
-        return ResponseEntity.ok(patientService.getPatientByIdWithRequestParam(id));
+    public ResponseEntity<ResponseMessage<PatientResponse>> getPatientById(@PathVariable Long id){
+        return ResponseEntity.ok(patientService.getPatientById(id));
     }
 
     // !!! 4) getAllPatientWithPageable (Tüm hastaları sayfalı olarak listeleme)
@@ -49,12 +49,10 @@ public class PatientController {
         return ResponseEntity.ok(patientService.updatePatientById(id, patientRequest));
     }
 
-/*
     // !!! 5) deletePatientById (id ile hasta silme)
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseMessage<PatientResponse>> deletePatientById(@PathVariable Long id){
-        return ResponseEntity.ok(patientService.deletePatientById(id));
+    public ResponseEntity<ResponseMessage<PatientResponse>> deletePatient(@PathVariable Long id){
+        return ResponseEntity.ok(patientService.deletePatient(id));
     }
-*/
 
 }
