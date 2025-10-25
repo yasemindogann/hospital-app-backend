@@ -5,13 +5,11 @@ import com.lenora.entity.concretes.user.Doctor;
 import com.lenora.entity.concretes.user.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ExaminationRepository extends JpaRepository<Examination, Long> {
     boolean existsByDoctorAndPatient(Doctor doctor, Patient patient);
-
-    void deleteAllByDoctor(Doctor doctor);
-
-    void deleteAllByPatient(Patient patient);
+    List<Examination> findByDoctor(Doctor doctor);
 
 }

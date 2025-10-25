@@ -115,6 +115,7 @@ public class DoctorService {
                 .build();
     }
 
+/*
     // !!! 5) deleteDoctor
     @Transactional
     public ResponseMessage<DoctorResponse> deleteDoctor(Long id){
@@ -128,5 +129,7 @@ public class DoctorService {
                 .object(null)
                 .build();
     }
+*/
+
 }
 

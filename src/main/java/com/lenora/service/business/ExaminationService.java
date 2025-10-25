@@ -108,6 +108,7 @@ public class ExaminationService {
                 .build();
     }
 
+/*
     // !!! 5) deleteExamination (Examination silme)
     @Transactional
     public ResponseMessage<ExaminationResponse> deleteExamination(Long id) {
@@ -121,5 +122,5 @@ public class ExaminationService {
                 .object(null)
                 .build();
     }
-
+*/
 }

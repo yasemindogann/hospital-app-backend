@@ -48,9 +48,11 @@ public class ExaminationController {
         return ResponseEntity.ok(examinationService.updateExaminationById(id, examinationRequest));
     }
 
+/*
     // !!! 5) deleteExamination (Examination silme)
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseMessage<ExaminationResponse>> deleteExamination(@PathVariable Long id){
         return ResponseEntity.ok(examinationService.deleteExamination(id));
     }
+ */
 }

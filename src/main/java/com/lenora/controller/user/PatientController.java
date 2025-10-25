@@ -49,11 +49,12 @@ public class PatientController {
         return ResponseEntity.ok(patientService.updatePatientById(id, patientRequest));
     }
 
+/*
     // !!! 5) deletePatientById (id ile hasta silme)
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseMessage<PatientResponse>> deletePatientById(@PathVariable Long id){
         return ResponseEntity.ok(patientService.deletePatientById(id));
     }
-
+*/
 
 }

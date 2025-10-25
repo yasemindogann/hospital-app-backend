@@ -53,5 +53,4 @@ public class PrescriptionController {
     public ResponseEntity<ResponseMessage<PrescriptionResponse>> deletePrescription(@PathVariable Long id){
         return ResponseEntity.ok(prescriptionService.deletePrescription(id));
     }
-
 }

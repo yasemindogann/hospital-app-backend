@@ -88,6 +88,7 @@ public class PatientService {
                 .build();
     }
 
+/*
     // !!! 5) deletePatientById (id ile hasta silme)
     @Transactional
     public ResponseMessage<PatientResponse> deletePatientById(Long id) {
@@ -101,5 +102,5 @@ public class PatientService {
                 .object(null)
                 .build();
     }
-
+*/
 }

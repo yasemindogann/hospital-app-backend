@@ -17,6 +17,9 @@ import com.lenora.repository.user.PatientRepository;
 import com.lenora.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -77,7 +80,7 @@ public class MethodHelper {
                 && !(existing.getDoctor().equals(doctor) && existing.getPatient().equals(patient));
     }
 
-    //// Prescription ID ile getir — yoksa hata fırlat
+    // Prescription ID ile getir — yoksa hata fırlat
     public Prescription getByIdPrescription(Long id){
         return prescriptionRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessages.PRESCRIPION_NOT_FOUND, id)));
