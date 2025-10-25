@@ -4,7 +4,6 @@ import com.lenora.entity.concretes.business.Examination;
 import com.lenora.entity.concretes.user.Doctor;
 import com.lenora.entity.concretes.user.Patient;
 import com.lenora.exception.ConflictException;
-import com.lenora.exception.ResourceNotFoundException;
 import com.lenora.payload.mapper.business.ExaminationMapper;
 import com.lenora.payload.messages.ErrorMessages;
 import com.lenora.payload.messages.SuccessMessages;
@@ -12,8 +11,7 @@ import com.lenora.payload.request.business.ExaminationRequest;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.payload.response.business.ExaminationResponse;
 import com.lenora.repository.business.ExaminationRepository;
-import com.lenora.repository.user.DoctorRepository;
-import com.lenora.repository.user.PatientRepository;
+import com.lenora.repository.business.PrescriptionRepository;
 import com.lenora.service.helper.MethodHelper;
 import com.lenora.service.helper.PageableHelper;
 import lombok.RequiredArgsConstructor;
@@ -23,16 +21,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.print.Doc;
-
 @Service
 @RequiredArgsConstructor
 public class ExaminationService {
 
     private final ExaminationRepository examinationRepository;
+    private final PrescriptionRepository prescriptionRepository;
     private final ExaminationMapper examinationMapper;
-    private final DoctorRepository doctorRepository;
-    private final PatientRepository patientRepository;
     private final PageableHelper pageableHelper;
     private final MethodHelper methodHelper;
 
@@ -98,8 +93,7 @@ public class ExaminationService {
         Patient patient = methodHelper.getByIdPatient(examinationRequest.getPatientId());
 
         // Aynı doktor–hasta ilişkisiyle başka bir muayene varsa engelle
-        if (examinationRepository.existsByDoctorAndPatient(doctor, patient)
-                && !(examination.getDoctor().equals(doctor) && examination.getPatient().equals(patient))) {
+        if (methodHelper.isDuplicateDoctorPatient(examination, doctor, patient)) {
             throw new ConflictException(ErrorMessages.EXAMINATION_ALREADY_EXISTS);
         }
 

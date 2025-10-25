@@ -1,6 +1,7 @@
 package com.lenora.service.helper;
 
 import com.lenora.entity.concretes.business.Examination;
+import com.lenora.entity.concretes.business.Prescription;
 import com.lenora.entity.concretes.user.Doctor;
 import com.lenora.entity.concretes.user.Patient;
 import com.lenora.entity.concretes.user.User;
@@ -10,6 +11,7 @@ import com.lenora.exception.ResourceNotFoundException;
 import com.lenora.payload.messages.ErrorMessages;
 import com.lenora.payload.request.business.ExaminationRequest;
 import com.lenora.repository.business.ExaminationRepository;
+import com.lenora.repository.business.PrescriptionRepository;
 import com.lenora.repository.user.DoctorRepository;
 import com.lenora.repository.user.PatientRepository;
 import com.lenora.repository.user.UserRepository;
@@ -24,6 +26,7 @@ public class MethodHelper {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final ExaminationRepository examinationRepository;
+    private final PrescriptionRepository prescriptionRepository;
 
     // userName ile unique kontrolü — Bu userName zaten var mı?
     public boolean checkUserNameExists(String userName) {
@@ -67,6 +70,17 @@ public class MethodHelper {
     public Examination getByIdExamination(Long id){
         return examinationRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException(String.format(ErrorMessages.EXAMINATION_NOT_FOUND, id)));
+    }
+
+    public boolean isDuplicateDoctorPatient(Examination existing, Doctor doctor, Patient patient) {
+        return examinationRepository.existsByDoctorAndPatient(doctor, patient)
+                && !(existing.getDoctor().equals(doctor) && existing.getPatient().equals(patient));
+    }
+
+    //// Prescription ID ile getir — yoksa hata fırlat
+    public Prescription getByIdPrescription(Long id){
+        return prescriptionRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException(String.format(ErrorMessages.PRESCRIPION_NOT_FOUND, id)));
     }
 
 }

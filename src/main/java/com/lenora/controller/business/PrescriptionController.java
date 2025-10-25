@@ -18,7 +18,7 @@ public class PrescriptionController {
 
     private final PrescriptionService prescriptionService;
 
-    // !!! 1) saveExamination (Yeni reçete oluşturma)
+    // !!! 1) savePrescription (Yeni reçete oluşturma)
     @PostMapping
     public ResponseEntity<ResponseMessage<PrescriptionResponse>> savePrescription(@Valid @RequestBody PrescriptionRequest prescriptionRequest){
         return ResponseEntity.status(HttpStatus.CREATED)

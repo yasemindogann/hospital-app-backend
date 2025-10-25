@@ -10,4 +10,8 @@ import java.util.Optional;
 public interface ExaminationRepository extends JpaRepository<Examination, Long> {
     boolean existsByDoctorAndPatient(Doctor doctor, Patient patient);
 
+    void deleteAllByDoctor(Doctor doctor);
+
+    void deleteAllByPatient(Patient patient);
+
 }

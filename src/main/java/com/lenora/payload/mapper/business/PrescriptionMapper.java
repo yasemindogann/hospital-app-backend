@@ -32,4 +32,12 @@ public class PrescriptionMapper {
                 .build();
     }
 
+    // (updatePrescriptionById için)
+    public void updateEntityFromRequest(Prescription prescription, PrescriptionRequest prescriptionRequest, Examination examination){
+        prescription.setExamination(examination);
+        prescription.setMedicineName(prescriptionRequest.getMedicineName());
+        prescription.setDosage(prescriptionRequest.getDosage());
+        prescription.setDescription(prescriptionRequest.getDescription());
+    }
+
 }

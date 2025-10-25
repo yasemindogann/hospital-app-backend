@@ -11,7 +11,10 @@ public class ErrorMessages {
     public static final String USER_ALREADY_REGISTERED_AS_DOCTOR = "User with ID %d is already registered as a doctor.";
 
     public static final String PATIENT_NOT_FOUND = "Patient not found with id: %s";
+
     public static final String EXAMINATION_ALREADY_EXISTS = "Examination already exists";
     public static final String EXAMINATION_NOT_FOUND = "Examination not found with id: %s";
+
+    public static final String PRESCRIPION_NOT_FOUND = "Prescription not found with id: %s";
 
 }

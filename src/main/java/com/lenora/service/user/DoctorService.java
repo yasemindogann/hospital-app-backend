@@ -11,6 +11,7 @@ import com.lenora.payload.response.user.DoctorResponse;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.repository.business.ExaminationRepository;
 import com.lenora.repository.user.DoctorRepository;
+import com.lenora.service.business.ExaminationService;
 import com.lenora.service.helper.MethodHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class DoctorService {
     private final DoctorMapper doctorMapper;
     private final UserService userService;
     private final MethodHelper methodHelper;
-    private final ExaminationRepository examinationRepository;
+    private final ExaminationService examinationService;
 
     // !!! 1) saveDoctor (Yeni doktor oluşturma)
     @Transactional
@@ -127,7 +128,5 @@ public class DoctorService {
                 .object(null)
                 .build();
     }
-
-
 }
 

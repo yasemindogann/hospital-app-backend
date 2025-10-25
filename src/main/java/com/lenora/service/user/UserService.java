@@ -27,6 +27,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final MethodHelper methodHelper;
     private final DoctorRepository doctorRepository;
+    private final DoctorService doctorService;
 
     // !!! 1) saveUser (Yeni kullanıcı oluşturma)
     @Transactional
@@ -104,11 +105,8 @@ public class UserService {
     // !!! 5) deleteUserById (Kullanıcı silme)
     @Transactional
     public ResponseMessage<UserResponse> deleteUser(Long id) {
-        User user = methodHelper.getByIdUser(id);
 
-        // Eğer user bir doktorsa, ona bağlı doktor kaydını sil
-        doctorRepository.findByUserId(user.getId())
-                .ifPresent(doctorRepository::delete); //ifPresent -> değer varsa sil, yoksa hiçbir şey yapma
+        User user = methodHelper.getByIdUser(id);
 
         // Entity üzerinden silmek, JPA ilişkilerini (örneğin Doctor) doğru şekilde yönetir
         userRepository.delete(user);

@@ -6,6 +6,7 @@ import com.lenora.payload.messages.SuccessMessages;
 import com.lenora.payload.request.user.PatientRequest;
 import com.lenora.payload.response.user.PatientResponse;
 import com.lenora.payload.response.ResponseMessage;
+import com.lenora.repository.business.ExaminationRepository;
 import com.lenora.repository.user.PatientRepository;
 import com.lenora.service.helper.MethodHelper;
 import com.lenora.service.helper.PageableHelper;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final ExaminationRepository examinationRepository;
     private final PatientMapper patientMapper;
     private final PageableHelper pageableHelper;
     private final MethodHelper methodHelper;
@@ -89,6 +91,7 @@ public class PatientService {
     // !!! 5) deletePatientById (id ile hasta silme)
     @Transactional
     public ResponseMessage<PatientResponse> deletePatientById(Long id) {
+
         Patient patient = methodHelper.getByIdPatient(id);
         patientRepository.delete(patient);
 

@@ -29,7 +29,9 @@ public class SuccessMessages {
     public static final String EXAMINATION_DELETED_SUCCESSFULY = "Examination deleted successfully";
 
     public static final String PRESCRIPTION_CREATED_SUCCESSFULY = "Prescription created successfully";
+    public static final String PRESCRIPTION_LISTED_SUCCESSFULY = "Prescription listed successfully";
+    public static final String PRESCRIPTION_FOUNDED_SUCCESSFULY = "Prescription founded successfully";
     public static final String PRESCRIPTION_UPDATED_SUCCESSFULY = "Prescription updated successfully";
-    public static final String PRESCRIPTION_DELETED_SUCCESSFULY = "Prescription deleted successfully";
+    public static final String PRESCRIPTION_DELETED_SUCCESSFULLY = "Prescription deleted successfully";
 
 }
