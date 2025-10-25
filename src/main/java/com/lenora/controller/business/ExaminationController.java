@@ -42,7 +42,6 @@ public class ExaminationController {
         return ResponseEntity.ok(examinationService.getExaminationById(id));
     }
 
-
     // !!! 4) updateExaminationById (Examination güncelleme)
     @PutMapping("/{id}")
     public ResponseEntity<ResponseMessage<ExaminationResponse>> updateExaminationById(@PathVariable Long id, @Valid @RequestBody ExaminationRequest examinationRequest){
