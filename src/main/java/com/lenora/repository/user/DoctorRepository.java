@@ -13,5 +13,5 @@ public interface DoctorRepository extends JpaRepository<Doctor, Long> {
     // Soft delete destekli sorgular
     Optional<Doctor> findByIdAndActiveTrue(Long id);
     List<Doctor> findAllByActiveTrue();
-    Optional<Doctor> findByUserIdAndActiveTrue(Long userId);
+    Optional<Doctor> findByUserIdAndActiveTrue(Long id);
 }

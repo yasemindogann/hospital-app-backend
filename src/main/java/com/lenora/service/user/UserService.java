@@ -1,5 +1,6 @@
 package com.lenora.service.user;
 
+import com.lenora.entity.concretes.business.Examination;
 import com.lenora.entity.concretes.user.User;
 import com.lenora.entity.enums.Role;
 import com.lenora.exception.ConflictException;
@@ -10,6 +11,8 @@ import com.lenora.payload.request.user.UserRequest;
 import com.lenora.payload.request.user.UserUpdateRequest;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.payload.response.user.UserResponse;
+import com.lenora.repository.business.ExaminationRepository;
+import com.lenora.repository.business.PrescriptionRepository;
 import com.lenora.repository.user.DoctorRepository;
 import com.lenora.repository.user.UserRepository;
 import com.lenora.service.helper.MethodHelper;
@@ -29,6 +32,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final MethodHelper methodHelper;
     private final DoctorRepository doctorRepository;
+    private final ExaminationRepository examinationRepository;
+    private final PrescriptionRepository prescriptionRepository;
 
     // !!! 1) saveUser (Yeni kullanıcı oluşturma)
     @Transactional
@@ -106,23 +111,32 @@ public class UserService {
     }
 
     // !!! 5) deleteUserById (Kullanıcı silme)
+    @Transactional
     public ResponseMessage<UserResponse> deleteUser(Long id) {
-
         User user = methodHelper.getByIdUser(id);
 
-        //Soft delete uygula (aktiflik false yapılır)
+        // User soft delete
         methodHelper.deactivateEntity(user);
 
-        // Eğer user bir doctor’a bağlıysa, onu da pasifleştir
-        doctorRepository.findByUserIdAndActiveTrue(user.getId())
-                .ifPresent(doctor -> methodHelper.deactivateEntity(doctor));
+        // Eğer bu user bir doctor'a bağlıysa:
+        doctorRepository.findByUserIdAndActiveTrue(user.getId()).ifPresent(doctor -> {
+            methodHelper.deactivateEntity(doctor);
 
-        UserResponse userResponse = userMapper.userToUserResponse(user);
+            // Doktora bağlı tüm muayeneleri getir
+            List<Examination> examinations = examinationRepository.findAllByDoctorAndActiveTrue(doctor);
+            for (Examination examination : examinations) {
+                methodHelper.deactivateEntity(examination);
+
+                // Her muayenenin reçetesi varsa onu da pasifleştir
+                prescriptionRepository.findByExaminationAndActiveTrue(examination)
+                        .ifPresent(methodHelper::deactivateEntity);
+            }
+        });
 
         return ResponseMessage.<UserResponse>builder()
                 .message(SuccessMessages.USER_DELETED_SUCCESSFULLY)
                 .httpStatus(HttpStatus.OK)
-                .object(userResponse)
+                .object(userMapper.userToUserResponse(user))
                 .build();
     }
 

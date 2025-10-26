@@ -117,15 +117,17 @@ public class ExaminationService {
     public ResponseMessage<ExaminationResponse> deleteExamination(Long id) {
         Examination examination = methodHelper.getByIdExamination(id);
 
-        //Soft delete uygula (aktiflik false yapılır)
+        // Muayeneyi pasifleştir
         methodHelper.deactivateEntity(examination);
 
-        ExaminationResponse response = examinationMapper.examinationToExaminationResponse(examination);
+        // Bağlı reçete varsa pasifleştir
+        prescriptionRepository.findByExaminationAndActiveTrue(examination)
+                .ifPresent(methodHelper::deactivateEntity);
 
         return ResponseMessage.<ExaminationResponse>builder()
                 .message(SuccessMessages.EXAMINATION_DELETED_SUCCESSFULLY)
                 .httpStatus(HttpStatus.OK)
-                .object(response)
+                .object(examinationMapper.examinationToExaminationResponse(examination))
                 .build();
     }
 

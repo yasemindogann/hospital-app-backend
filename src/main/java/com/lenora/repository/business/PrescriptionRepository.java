@@ -1,5 +1,6 @@
 package com.lenora.repository.business;
 
+import com.lenora.entity.concretes.business.Examination;
 import com.lenora.entity.concretes.business.Prescription;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,7 +12,6 @@ import java.util.Optional;
 public interface PrescriptionRepository extends JpaRepository<Prescription, Long> {
     // Soft delete destekli sorgular
     Optional<Prescription> findByIdAndActiveTrue(Long id);
-    List<Prescription> findAllByActiveTrue();
     Page<Prescription> findByActiveTrue(Pageable pageable);
-    Optional<Prescription> findByExaminationId(Long examinationId);
+    Optional<Prescription> findByExaminationAndActiveTrue(Examination examination);
 }

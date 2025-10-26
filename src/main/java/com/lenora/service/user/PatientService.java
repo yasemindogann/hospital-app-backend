@@ -8,6 +8,7 @@ import com.lenora.payload.request.user.PatientRequest;
 import com.lenora.payload.response.user.PatientResponse;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.repository.business.ExaminationRepository;
+import com.lenora.repository.business.PrescriptionRepository;
 import com.lenora.repository.user.PatientRepository;
 import com.lenora.service.business.ExaminationService;
 import com.lenora.service.helper.MethodHelper;
@@ -31,6 +32,7 @@ public class PatientService {
     private final PageableHelper pageableHelper;
     private final MethodHelper methodHelper;
     private final ExaminationService examinationService;
+    private final PrescriptionRepository prescriptionRepository;
 
 
     // !!! 1) savePatient (Yeni hasta oluşturma)
@@ -98,14 +100,24 @@ public class PatientService {
     public ResponseMessage<PatientResponse> deletePatient(Long id) {
         Patient patient = methodHelper.getByIdPatient(id);
 
-        //Soft delete uygula (aktiflik false yapılır)
+        // Hastayı soft delete yap
         methodHelper.deactivateEntity(patient);
-        PatientResponse response = patientMapper.patientToPatientResponse(patient);
+
+        // Hastaya bağlı muayeneleri bul
+        List<Examination> examinations = examinationRepository.findAllByPatientAndActiveTrue(patient);
+
+        for (Examination examination : examinations) {
+            methodHelper.deactivateEntity(examination);
+
+            // Muayeneye bağlı reçete varsa pasifleştir
+            prescriptionRepository.findByExaminationAndActiveTrue(examination)
+                    .ifPresent(methodHelper::deactivateEntity);
+        }
 
         return ResponseMessage.<PatientResponse>builder()
                 .message(SuccessMessages.PATIENT_DELETED_SUCCESSFULLY)
                 .httpStatus(HttpStatus.OK)
-                .object(response)
+                .object(patientMapper.patientToPatientResponse(patient))
                 .build();
     }
 

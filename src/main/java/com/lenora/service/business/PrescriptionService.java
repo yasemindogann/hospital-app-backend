@@ -35,13 +35,6 @@ public class PrescriptionService {
         //id'sine kaydetmek istediği muayeneyi varsa getir yoksa hata mesajı
         Examination examination = methodHelper.getByIdExamination(prescriptionRequest.getExaminationId());
 
-        //Bu muayeneye ait reçete zaten varsa hata fırlat
-        prescriptionRepository.findByExaminationId(examination.getId())
-                .ifPresent(existing -> {
-                    throw new ConflictException(String.format(
-                            ErrorMessages.PRESCRIPTION_ALREADY_EXISTS_FOR_EXAMINATION, examination.getId()));
-                });
-
         Prescription prescription = prescriptionMapper.prescriptionRequestToPrescription(prescriptionRequest, examination);
 
         Prescription savedPrescription = prescriptionRepository.save(prescription);
@@ -102,17 +95,14 @@ public class PrescriptionService {
 
     @Transactional
     public ResponseMessage<PrescriptionResponse> deletePrescription(Long id) {
+
         Prescription prescription = methodHelper.getByIdPrescription(id);
-
-        //Soft delete uygula (aktiflik false yapılır)
         methodHelper.deactivateEntity(prescription);
-
-        PrescriptionResponse response = prescriptionMapper.prescriptionToPrescriptionResponse(prescription);
 
         return ResponseMessage.<PrescriptionResponse>builder()
                 .message(SuccessMessages.PRESCRIPTION_DELETED_SUCCESSFULLY)
                 .httpStatus(HttpStatus.OK)
-                .object(response)
+                .object(prescriptionMapper.prescriptionToPrescriptionResponse(prescription))
                 .build();
     }
 

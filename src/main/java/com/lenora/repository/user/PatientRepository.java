@@ -11,6 +11,5 @@ import java.util.Optional;
 public interface PatientRepository extends JpaRepository<Patient, Long> {
     // Soft delete destekli sorgular
     Optional<Patient> findByIdAndActiveTrue(Long id);
-    List<Patient> findAllByActiveTrue();
     Page<Patient> findByActiveTrue(Pageable pageable);
 }

@@ -15,6 +15,8 @@ public interface ExaminationRepository extends JpaRepository<Examination, Long> 
 
     // Soft delete destekli sorgular
     Optional<Examination> findByIdAndActiveTrue(Long id);
-    List<Examination> findAllByActiveTrue();
     Page<Examination> findByActiveTrue(Pageable pageable);
+    List<Examination> findAllByDoctorAndActiveTrue(Doctor doctor);
+    List<Examination> findAllByPatientAndActiveTrue(Patient patient);
+
 }

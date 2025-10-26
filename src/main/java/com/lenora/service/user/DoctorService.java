@@ -11,6 +11,7 @@ import com.lenora.payload.request.user.DoctorRequest;
 import com.lenora.payload.response.user.DoctorResponse;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.repository.business.ExaminationRepository;
+import com.lenora.repository.business.PrescriptionRepository;
 import com.lenora.repository.user.DoctorRepository;
 import com.lenora.service.business.ExaminationService;
 import com.lenora.service.helper.MethodHelper;
@@ -31,6 +32,7 @@ public class DoctorService {
     private final MethodHelper methodHelper;
     private final ExaminationService examinationService;
     private final ExaminationRepository examinationRepository;
+    private final PrescriptionRepository prescriptionRepository;
 
     // !!! 1) saveDoctor (Yeni doktor oluşturma)
     @Transactional
@@ -121,14 +123,24 @@ public class DoctorService {
     public ResponseMessage<DoctorResponse> deleteDoctor(Long id) {
         Doctor doctor = methodHelper.getByIdDoctor(id);
 
-        //Soft delete uygula (aktiflik false yapılır)
+        // Doktoru soft delete yap
         methodHelper.deactivateEntity(doctor);
-        DoctorResponse response = doctorMapper.doctorToDoctorResponse(doctor);
+
+        // Doktora bağlı muayeneleri getir
+        List<Examination> examinations = examinationRepository.findAllByDoctorAndActiveTrue(doctor);
+
+        for (Examination examination : examinations) {
+            methodHelper.deactivateEntity(examination);
+
+            // Muayeneye bağlı reçete varsa onu da pasifleştir
+            prescriptionRepository.findByExaminationAndActiveTrue(examination)
+                    .ifPresent(methodHelper::deactivateEntity);
+        }
 
         return ResponseMessage.<DoctorResponse>builder()
                 .message(SuccessMessages.DOCTOR_DELETED_SUCCESSFULLY)
                 .httpStatus(HttpStatus.OK)
-                .object(response)
+                .object(doctorMapper.doctorToDoctorResponse(doctor))
                 .build();
     }
 
