@@ -1,13 +1,13 @@
-package com.lenora.controller;
+package com.lenora.controller.auth;
 
 import com.lenora.entity.concretes.user.User;
 import com.lenora.payload.request.login.ChangePasswordRequest;
 import com.lenora.payload.request.login.LoginRequest;
-import com.lenora.payload.response.ResponseMessage;
+import com.lenora.payload.response.login.LoginResponse;
 import com.lenora.repository.user.UserRepository;
-import com.lenora.security.JwtUtil;
-import com.lenora.security.TokenBlacklist;
-import com.lenora.security.UserPrincipal;
+import com.lenora.security.jwt.JwtUtil;
+import com.lenora.security.jwt.TokenBlacklist;
+import com.lenora.security.model.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -59,9 +59,10 @@ public class AuthController {
                 .maxAge(7 * 24 * 60 * 60) // 7 gün
                 .build();
 
+        // LoginResponse döndürüyoruz:
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString())
-                .body("Login successful");
+                .body(new LoginResponse(accessToken, refreshToken, user.getUserName(), user.getRole().name()));
     }
 
     // ✅ Logout → Token blacklist'e eklenecek + cookie temizlenecek

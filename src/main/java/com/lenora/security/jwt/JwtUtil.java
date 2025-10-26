@@ -1,4 +1,4 @@
-package com.lenora.security;
+package com.lenora.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

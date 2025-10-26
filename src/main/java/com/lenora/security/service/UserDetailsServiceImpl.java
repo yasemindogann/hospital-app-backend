@@ -1,7 +1,8 @@
-package com.lenora.security;
+package com.lenora.security.service;
 
 import com.lenora.entity.concretes.user.User;
 import com.lenora.repository.user.UserRepository;
+import com.lenora.security.model.UserPrincipal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

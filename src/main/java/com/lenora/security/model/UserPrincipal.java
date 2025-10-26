@@ -1,4 +1,4 @@
-package com.lenora.security;
+package com.lenora.security.model;
 
 import com.lenora.entity.concretes.user.User;
 import org.springframework.security.core.GrantedAuthority;
