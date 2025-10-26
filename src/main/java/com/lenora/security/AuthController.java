@@ -3,9 +3,11 @@ package com.lenora.security;
 import com.lenora.entity.concretes.user.User;
 import com.lenora.payload.request.login.ChangePasswordRequest;
 import com.lenora.payload.request.login.LoginRequest;
+import com.lenora.payload.response.ResponseMessage;
 import com.lenora.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +15,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -79,6 +83,26 @@ public class AuthController {
                 .body("Logged out successfully");
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not authenticated");
+        }
+
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        User user = userRepository.findByUserName(userPrincipal.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return ResponseEntity.ok()
+                .body(Map.of(
+                        "username", user.getUserName(),
+                        "email", user.getEmail(),
+                        "role", user.getRole(),
+                        "active", user.getActive(),
+                        "createdDateTime", user.getCreatedDateTime()
+                ));
+    }
+
     // ✅ Şifre değiştirme
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
@@ -92,5 +116,29 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok("Password updated successfully");
+    }
+
+    // 🔹 Refresh Token endpoint
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
+        if (refreshToken == null || !jwtUtil.validateToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        }
+
+        String username = jwtUtil.extractUsername(refreshToken);
+        String role = jwtUtil.extractRole(refreshToken);
+
+        String newAccessToken = jwtUtil.generateAccessToken(username, role);
+
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", newAccessToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(3600)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString())
+                .body("Access token refreshed successfully");
     }
 }

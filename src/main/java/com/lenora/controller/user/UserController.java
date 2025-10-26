@@ -1,6 +1,7 @@
 package com.lenora.controller.user;
 
 import com.lenora.payload.request.user.UserRequest;
+import com.lenora.payload.request.user.UserUpdateRequest;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.payload.response.user.UserResponse;
 import com.lenora.service.user.UserService;
@@ -47,8 +48,8 @@ public class UserController {
     // !!! 4) updateUserById (Kullanıcı güncelleme)
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or #id == authentication.principal.user.id")
-    public ResponseEntity<ResponseMessage<UserResponse>> updateUserById(@PathVariable Long id, @Valid @RequestBody UserRequest userRequest){
-        return ResponseEntity.ok(userService.updateUserById(id, userRequest));
+    public ResponseEntity<ResponseMessage<UserResponse>> updateUserById(@PathVariable Long id, @Valid @RequestBody UserUpdateRequest userUpdateRequest){
+        return ResponseEntity.ok(userService.updateUserById(id, userUpdateRequest));
     }
 
     // !!! 5) deleteUserById (Kullanıcı silme)

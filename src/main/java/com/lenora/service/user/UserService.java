@@ -7,6 +7,7 @@ import com.lenora.payload.mapper.user.UserMapper;
 import com.lenora.payload.messages.ErrorMessages;
 import com.lenora.payload.messages.SuccessMessages;
 import com.lenora.payload.request.user.UserRequest;
+import com.lenora.payload.request.user.UserUpdateRequest;
 import com.lenora.payload.response.ResponseMessage;
 import com.lenora.payload.response.user.UserResponse;
 import com.lenora.repository.user.DoctorRepository;
@@ -77,24 +78,24 @@ public class UserService {
 
     // !!! 4) updateUserById (Kullanıcı güncelleme)
     @Transactional
-    public ResponseMessage<UserResponse> updateUserById(Long id, UserRequest userRequest) {
+    public ResponseMessage<UserResponse> updateUserById(Long id, UserUpdateRequest userUpdateRequest) {
         User user = methodHelper.getByIdUser(id);
 
         // Username başka kullanıcıda varsa hata
-        if (!user.getUserName().equalsIgnoreCase(userRequest.getUserName()) &&
-                methodHelper.checkUserNameExists(userRequest.getUserName())) {
+        if (!user.getUserName().equalsIgnoreCase(userUpdateRequest.getUserName()) &&
+                methodHelper.checkUserNameExists(userUpdateRequest.getUserName())) {
             throw new ConflictException(
-                    String.format(ErrorMessages.USER_ALREADY_EXISTS, userRequest.getUserName())
+                    String.format(ErrorMessages.USER_ALREADY_EXISTS, userUpdateRequest.getUserName())
             );
         }
 
         //Rolü DOCTOR olan bir User update ile ADMIN olamasın
         // Eğer bu kullanıcı zaten doktor tablosunda varsa (yani bir doktor kayıtlıysa)
-        if (doctorRepository.existsByUserId(user.getId()) && userRequest.getRole() != Role.DOCTOR) {
+        if (doctorRepository.existsByUserId(user.getId()) && userUpdateRequest.getRole() != Role.DOCTOR) {
             throw new ConflictException(String.format(ErrorMessages.CANNOT_CHANGE_ROLE_OF_DOCTOR, user.getId()));
         }
 
-        userMapper.updateUserFromRequest(userRequest, user);
+        userMapper.updateUserFromRequest(userUpdateRequest, user);
         User updatedUser = userRepository.save(user);
 
         return ResponseMessage.<UserResponse>builder()

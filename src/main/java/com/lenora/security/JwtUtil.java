@@ -57,4 +57,5 @@ public class JwtUtil {
                 .getBody();
         return (String) claims.get("role");
     }
+
 }
