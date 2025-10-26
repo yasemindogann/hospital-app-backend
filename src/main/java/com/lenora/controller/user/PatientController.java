@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +21,7 @@ public class PatientController {
 
     // !!! 1) savePatient (Yeni hasta oluşturma)
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','SECRETARY')")
     public ResponseEntity<ResponseMessage<PatientResponse>> savePatient(@Valid @RequestBody PatientRequest patientRequest){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(patientService.savePatient(patientRequest));
@@ -27,6 +29,7 @@ public class PatientController {
 
     // !!! 2) getAllPatientWithPageable (Yeni hasta oluşturma)
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','SECRETARY','DOCTOR')")
     public ResponseEntity<ResponseMessage<Page<PatientResponse>>> getAllPatientWithPageable(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
@@ -39,18 +42,21 @@ public class PatientController {
 
     // !!! 3) getPatientByIdWithRequestParam (İstenilen id'li hastayı getir)
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','SECRETARY','DOCTOR')")
     public ResponseEntity<ResponseMessage<PatientResponse>> getPatientById(@PathVariable Long id){
         return ResponseEntity.ok(patientService.getPatientById(id));
     }
 
     // !!! 4) getAllPatientWithPageable (Tüm hastaları sayfalı olarak listeleme)
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','SECRETARY')")
     public ResponseEntity<ResponseMessage<PatientResponse>> updatePatientById(@PathVariable Long id, @Valid @RequestBody PatientRequest patientRequest) {
         return ResponseEntity.ok(patientService.updatePatientById(id, patientRequest));
     }
 
     // !!! 5) deletePatientById (id ile hasta silme)
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseMessage<PatientResponse>> deletePatient(@PathVariable Long id){
         return ResponseEntity.ok(patientService.deletePatient(id));
     }

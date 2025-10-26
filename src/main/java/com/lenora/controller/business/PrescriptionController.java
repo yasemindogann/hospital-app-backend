@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,6 +21,7 @@ public class PrescriptionController {
 
     // !!! 1) savePrescription (Yeni reçete oluşturma)
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<ResponseMessage<PrescriptionResponse>> savePrescription(@Valid @RequestBody PrescriptionRequest prescriptionRequest){
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(prescriptionService.savePrescription(prescriptionRequest));
@@ -27,6 +29,7 @@ public class PrescriptionController {
 
     // !!! 2) getAllPrescriptionWithPageable (Bütün reçeteleri Pageable yapıda getir)
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','SECRETARY')")
     public ResponseEntity<ResponseMessage<Page<PrescriptionResponse>>> getAllPrescriptionWithPageable(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "20") int size,
@@ -38,18 +41,21 @@ public class PrescriptionController {
 
     // !!! 3) getPrescriptionById (İstenilen id'li reçeteyi getir)
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR','SECRETARY')")
     public ResponseEntity<ResponseMessage<PrescriptionResponse>> getPrescriptionById(@PathVariable Long id){
         return ResponseEntity.ok(prescriptionService.getPrescriptionById(id));
     }
 
     // !!! 4) updatePrescriptionById (Reçete güncelleme)
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<ResponseMessage<PrescriptionResponse>> updatePrescriptionById(@PathVariable Long id, @Valid @RequestBody PrescriptionRequest prescriptionRequest){
         return ResponseEntity.ok(prescriptionService.updatePrescriptionById(id, prescriptionRequest));
     }
 
     // !!! 5) deletePrescription (Reçete silme)
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<ResponseMessage<PrescriptionResponse>> deletePrescription(@PathVariable Long id){
         return ResponseEntity.ok(prescriptionService.deletePrescription(id));
     }
