@@ -10,7 +10,6 @@ import com.lenora.payload.response.ResponseMessage;
 import com.lenora.repository.business.ExaminationRepository;
 import com.lenora.repository.business.PrescriptionRepository;
 import com.lenora.repository.user.PatientRepository;
-import com.lenora.service.business.ExaminationService;
 import com.lenora.service.helper.MethodHelper;
 import com.lenora.service.helper.PageableHelper;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,6 @@ public class PatientService {
     private final PatientMapper patientMapper;
     private final PageableHelper pageableHelper;
     private final MethodHelper methodHelper;
-    private final ExaminationService examinationService;
     private final PrescriptionRepository prescriptionRepository;
 
 
@@ -51,7 +49,7 @@ public class PatientService {
     }
 
 
-    // !!! 2) getAllPatientWithPageable (Yeni hasta oluşturma)
+    // !!! 2) getAllPatientWithPageable (Hastaları Pageable yapıda listele)
     @Transactional(readOnly = true)
     public ResponseMessage<Page<PatientResponse>> getAllPatientWithPageable(int page, int size, String sort, String type) {
 
@@ -82,7 +80,7 @@ public class PatientService {
                 .build();
     }
 
-    // !!! 4) updatePatientById (id ile hasta getirme)
+    // !!! 4) updatePatientById (Hasta güncelleme)
     @Transactional
     public ResponseMessage<PatientResponse> updatePatientById(Long id, PatientRequest patientRequest) {
         Patient patient = methodHelper.getByIdPatient(id);
@@ -96,6 +94,7 @@ public class PatientService {
                 .build();
     }
 
+    // !!! 4) deletePatient (Hasta silme)
     @Transactional
     public ResponseMessage<PatientResponse> deletePatient(Long id) {
         Patient patient = methodHelper.getByIdPatient(id);

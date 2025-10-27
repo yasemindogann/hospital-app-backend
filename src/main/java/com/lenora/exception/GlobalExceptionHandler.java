@@ -16,7 +16,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 🔹 Validation (Bean Validation) hataları
+    // Validation (Bean Validation) hataları
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseMessage<Map<String, String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
 
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    // 🔹 Conflict hatası (örneğin username veya email çakışması)
+    // Conflict hatası (örneğin username veya email çakışması)
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<ResponseMessage<Void>> handleConflict(ConflictException ex) {
 
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
-    // 🔹 Resource bulunamadı hatası (örneğin id yok)
+    // Resource bulunamadı hatası (örneğin id yok)
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ResponseMessage<Void>> handleNotFound(ResourceNotFoundException ex) {
 
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
-    // 🔹 Bad Request hatası
+    // Bad Request hatası
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ResponseMessage<Void>> handleBadRequest(BadRequestException ex) {
 
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    // 🔹 Diğer tüm beklenmedik hatalar
+    // Diğer tüm beklenmedik hatalar
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseMessage<Void>> handleGeneral(Exception ex) {
 

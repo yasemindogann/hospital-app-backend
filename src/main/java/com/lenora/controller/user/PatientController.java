@@ -27,7 +27,7 @@ public class PatientController {
                 .body(patientService.savePatient(patientRequest));
     }
 
-    // !!! 2) getAllPatientWithPageable (Yeni hasta oluşturma)
+    // !!! 2) getAllPatientWithPageable (Hastaları pageable yapıda getir)
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','SECRETARY','DOCTOR')")
     public ResponseEntity<ResponseMessage<Page<PatientResponse>>> getAllPatientWithPageable(
@@ -40,14 +40,14 @@ public class PatientController {
                 .body(patientService.getAllPatientWithPageable(page,size,sort,type));
     }
 
-    // !!! 3) getPatientByIdWithRequestParam (İstenilen id'li hastayı getir)
+    // !!! 3) getPatientById (İstenilen id'li hastayı getir)
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SECRETARY','DOCTOR')")
     public ResponseEntity<ResponseMessage<PatientResponse>> getPatientById(@PathVariable Long id){
         return ResponseEntity.ok(patientService.getPatientById(id));
     }
 
-    // !!! 4) getAllPatientWithPageable (Tüm hastaları sayfalı olarak listeleme)
+    // !!! 4) updatePatientById (Hastaları güncelleme)
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SECRETARY')")
     public ResponseEntity<ResponseMessage<PatientResponse>> updatePatientById(@PathVariable Long id, @Valid @RequestBody PatientRequest patientRequest) {

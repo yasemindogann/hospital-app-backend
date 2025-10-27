@@ -36,9 +36,9 @@ public class ExaminationService {
     @Transactional
     public ResponseMessage<ExaminationResponse> saveExamination(ExaminationRequest examinationRequest) {
 
-        //Kayıt yaparken seçtiğim doktorId'ye gerçeken DB'de var mı
+        //Kayıt yaparken seçtiğim doktorId gerçekten DB'de var mı
         Doctor doctor = methodHelper.getByIdDoctor(examinationRequest.getDoctorId());
-        //Kayıt yaparken seçtiğim hastaId'ye gerçeken DB'de var mı
+        //Kayıt yaparken seçtiğim hastaId gerçekten DB'de var mı
         Patient patient = methodHelper.getByIdPatient(examinationRequest.getPatientId());
 
         // Aynı doktor–hasta çifti varsa hata ver
@@ -57,7 +57,7 @@ public class ExaminationService {
                 .build();
     }
 
-    // !!! 2) getAllExaminationsWithPageable (Sadece aktif Examinationları Pageable yapıda getir)
+    // !!! 2) getAllExaminationsWithPageable (Sadece aktif muayeneleri Pageable yapıda getir)
     @Transactional(readOnly = true)
     public ResponseMessage<Page<ExaminationResponse>> getAllExaminationsWithPageable(int page, int size, String sort, String type) {
 
@@ -88,7 +88,7 @@ public class ExaminationService {
                 .build();
     }
 
-    // !!! 4) updateExaminationById (Examination güncelleme)
+    // !!! 4) updateExaminationById (Muayene güncelleme)
     @Transactional
     public ResponseMessage<ExaminationResponse> updateExaminationById(Long id, ExaminationRequest examinationRequest) {
 

@@ -12,5 +12,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Soft delete destekli sorgular
     Optional<User> findByIdAndActiveTrue(Long id);
     List<User> findAllByActiveTrue();
-    Optional<User> findByUserName(String userName);  // ✅ doğru hali
+    Optional<User> findByUserName(String userName);
 }

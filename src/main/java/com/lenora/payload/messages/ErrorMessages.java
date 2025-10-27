@@ -16,7 +16,4 @@ public class ErrorMessages {
     public static final String EXAMINATION_NOT_FOUND = "Examination not found with id: %s";
 
     public static final String PRESCRIPTION_NOT_FOUND = "Prescription not found with id: %s";
-    public static final String PRESCRIPTION_ALREADY_EXISTS_FOR_EXAMINATION =
-            "There is already a prescription registered for the examination with ID: %s";
-
 }

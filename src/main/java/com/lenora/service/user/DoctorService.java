@@ -13,7 +13,6 @@ import com.lenora.payload.response.ResponseMessage;
 import com.lenora.repository.business.ExaminationRepository;
 import com.lenora.repository.business.PrescriptionRepository;
 import com.lenora.repository.user.DoctorRepository;
-import com.lenora.service.business.ExaminationService;
 import com.lenora.service.helper.MethodHelper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -30,7 +29,6 @@ public class DoctorService {
     private final DoctorRepository doctorRepository;
     private final DoctorMapper doctorMapper;
     private final MethodHelper methodHelper;
-    private final ExaminationService examinationService;
     private final ExaminationRepository examinationRepository;
     private final PrescriptionRepository prescriptionRepository;
 
@@ -119,6 +117,7 @@ public class DoctorService {
                 .build();
     }
 
+    // !!! 5) deleteDoctor (Doktor silme)
     @Transactional
     public ResponseMessage<DoctorResponse> deleteDoctor(Long id) {
         Doctor doctor = methodHelper.getByIdDoctor(id);

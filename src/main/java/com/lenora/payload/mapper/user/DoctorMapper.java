@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DoctorMapper {
 
-    // 🔹 Request -> Entity
+    // Request -> Entity
     public Doctor doctorRequestToDoctor(DoctorRequest doctorRequest, User user){
         return Doctor.builder()
                 .fullName(doctorRequest.getFullName())
@@ -20,7 +20,7 @@ public class DoctorMapper {
                 .build();
     }
 
-    // 🔹 Entity -> Response
+    // Entity -> Response
     public DoctorResponse doctorToDoctorResponse(Doctor doctor){
         return DoctorResponse.builder()
                 .id(doctor.getId())
@@ -32,7 +32,7 @@ public class DoctorMapper {
                 .build();
     }
 
-    // Doctor update işlemi için DoctorRequest → Doctor mapping
+    // Update metodunda requestten yeni veriler alındığında DB'ye setlemek için
     public void updateDoctorFromRequest(DoctorRequest doctorRequest, Doctor doctor, User user) {
         doctor.setFullName(doctorRequest.getFullName());
         doctor.setSpecialization(doctorRequest.getSpecialization());

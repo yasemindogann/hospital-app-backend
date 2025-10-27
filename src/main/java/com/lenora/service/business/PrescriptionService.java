@@ -2,9 +2,7 @@ package com.lenora.service.business;
 
 import com.lenora.entity.concretes.business.Examination;
 import com.lenora.entity.concretes.business.Prescription;
-import com.lenora.exception.ConflictException;
 import com.lenora.payload.mapper.business.PrescriptionMapper;
-import com.lenora.payload.messages.ErrorMessages;
 import com.lenora.payload.messages.SuccessMessages;
 import com.lenora.payload.request.business.PrescriptionRequest;
 import com.lenora.payload.response.ResponseMessage;
@@ -46,7 +44,7 @@ public class PrescriptionService {
                 .build();
     }
 
-    // !!! 2) getAllPrescriptionWithPageable (Sadece aktif Prescriptionları Pageable yapıda getir)
+    // !!! 2) getAllPrescriptionWithPageable (Sadece aktif reçeteleri Pageable yapıda getir)
     @Transactional(readOnly = true)
     public ResponseMessage<Page<PrescriptionResponse>> getAllPrescriptionWithPageable(int page, int size, String sort, String type) {
 
@@ -64,7 +62,7 @@ public class PrescriptionService {
                 .build();
     }
 
-    // !!! 3) getPrescriptionById (İstenilen id'li Prescriptionı getir)
+    // !!! 3) getPrescriptionById (İstenilen id'li reçeteyi getir)
     public ResponseMessage<PrescriptionResponse> getPrescriptionById(Long id) {
         Prescription prescription = methodHelper.getByIdPrescription(id);
 
@@ -93,6 +91,7 @@ public class PrescriptionService {
                 .build();
     }
 
+    // !!! 5) deletePrescription (Reçete silme)
     @Transactional
     public ResponseMessage<PrescriptionResponse> deletePrescription(Long id) {
 

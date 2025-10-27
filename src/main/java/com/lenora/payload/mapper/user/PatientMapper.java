@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatientMapper {
 
-    // 🔹 Request -> Entity
+    // Request -> Entity
     public Patient patientRequestToPatient(PatientRequest patientRequest){
         return Patient.builder()
                 .fullName(patientRequest.getFullName())
@@ -20,7 +20,7 @@ public class PatientMapper {
     }
 
 
-    // 🔹 Entity -> Response
+    // Entity -> Response
     public PatientResponse patientToPatientResponse(Patient patient){
         return PatientResponse.builder()
                 .id(patient.getId())
@@ -32,7 +32,7 @@ public class PatientMapper {
                 .build();
     }
 
-    // Patient update işlemi için PatientRequest → Patient mapping
+    // Update metodunda requestten yeni veriler alındığında DB'ye setlemek için
     public void updatePatientFromRequest(PatientRequest patientRequest, Patient patient){
         patient.setFullName(patientRequest.getFullName());
         patient.setIdentityNumber(patientRequest.getIdentityNumber());

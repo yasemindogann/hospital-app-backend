@@ -27,7 +27,7 @@ public class ExaminationController {
                 .body(examinationService.saveExamination(examinationRequest));
     }
 
-    // !!! 2) getAllExaminationsWithPageable (Bütün Examinationları Pageable yapıda getir)
+    // !!! 2) getAllExaminationsWithPageable (Bütün muayeneleri Pageable yapıda getir)
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN','SECRETARY')")
     public ResponseEntity<ResponseMessage<Page<ExaminationResponse>>> getAllExaminationsWithPageable(
@@ -39,21 +39,21 @@ public class ExaminationController {
         return ResponseEntity.ok(examinationService.getAllExaminationsWithPageable(page, size, sort, type));
     }
 
-    // !!! 3) getExaminationById (İstenilen id'li Examinationı getir)
+    // !!! 3) getExaminationById (İstenilen id'li muayeneyi getir)
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SECRETARY')")
     public ResponseEntity<ResponseMessage<ExaminationResponse>> getExaminationById(@PathVariable Long id){
         return ResponseEntity.ok(examinationService.getExaminationById(id));
     }
 
-    // !!! 4) updateExaminationById (Examination güncelleme)
+    // !!! 4) updateExaminationById (Muayene güncelleme)
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<ResponseMessage<ExaminationResponse>> updateExaminationById(@PathVariable Long id, @Valid @RequestBody ExaminationRequest examinationRequest){
         return ResponseEntity.ok(examinationService.updateExaminationById(id, examinationRequest));
     }
 
-    // !!! 5) deleteExamination (Examination silme)
+    // !!! 5) deleteExamination (Muayene silme)
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','DOCTOR')")
     public ResponseEntity<ResponseMessage<ExaminationResponse>> deleteExamination(@PathVariable Long id){

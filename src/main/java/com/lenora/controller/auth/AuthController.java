@@ -3,7 +3,6 @@ package com.lenora.controller.auth;
 import com.lenora.entity.concretes.user.User;
 import com.lenora.payload.request.login.ChangePasswordRequest;
 import com.lenora.payload.request.login.LoginRequest;
-import com.lenora.payload.response.login.LoginResponse;
 import com.lenora.repository.user.UserRepository;
 import com.lenora.security.jwt.JwtUtil;
 import com.lenora.security.jwt.TokenBlacklist;
@@ -32,7 +31,7 @@ public class AuthController {
     private final TokenBlacklist tokenBlacklist;
     private final PasswordEncoder passwordEncoder;
 
-    // ✅ JSON body ile login
+    // JSON body ile login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
@@ -44,7 +43,7 @@ public class AuthController {
         String accessToken = jwtUtil.generateAccessToken(user.getUserName(), user.getRole().name());
         String refreshToken = jwtUtil.generateRefreshToken(user.getUserName());
 
-        // ✅ Tokenları sadece cookie olarak gönder
+        // Tokenları sadece cookie olarak gönder
         ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
                 .httpOnly(true)
                 .secure(false) // üretimde true olmalı (HTTPS)
@@ -64,7 +63,7 @@ public class AuthController {
                 .body("Login successful");
     }
 
-    // ✅ Logout → Token blacklist'e eklenecek + cookie temizlenecek
+    // Logout → Token blacklist'e eklenecek + cookie temizlenecek
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@CookieValue(value = "access_token", required = false) String accessToken) {
         if (accessToken != null) {
@@ -86,6 +85,7 @@ public class AuthController {
                 .body("Logged out successfully");
     }
 
+    // Kullanıcı bilgileri
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -106,7 +106,7 @@ public class AuthController {
                 ));
     }
 
-    // ✅ Şifre değiştirme
+    // Şifre değiştirme
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
         User user = userRepository.findByUserName(request.getUserName()).orElseThrow();
@@ -121,7 +121,7 @@ public class AuthController {
         return ResponseEntity.ok("Password updated successfully");
     }
 
-    // 🔹 Refresh Token endpoint
+    // Refresh Token endpoint
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@CookieValue(value = "refresh_token", required = false) String refreshToken) {
         if (refreshToken == null || !jwtUtil.validateToken(refreshToken)) {

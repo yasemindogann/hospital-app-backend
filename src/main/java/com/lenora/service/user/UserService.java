@@ -36,7 +36,7 @@ public class UserService {
     private final PrescriptionRepository prescriptionRepository;
 
     // !!! 1) saveUser (Yeni kullanıcı oluşturma)
-    @Transactional
+    @Transactional // Eğer metot içinde bir hata (örneğin RuntimeException) oluşursa Spring tüm değişiklikleri geri alır (rollback)
     public ResponseMessage<UserResponse> saveUser(UserRequest userRequest) {
         if (methodHelper.checkUserNameExists(userRequest.getUserName())) {
             throw new ConflictException(
@@ -55,7 +55,7 @@ public class UserService {
     }
 
     // !!! 2) getAllUserWithList (Aktif kullanıcıları listele)
-    @Transactional(readOnly = true)
+    @Transactional(readOnly = true) // Hibernate okuma moduna geçer, Spring, metot süresince tek bir transaction açar
     public ResponseMessage<List<UserResponse>> getAllUserWithList() {
 
         List<UserResponse> userList = userRepository.findAllByActiveTrue()
@@ -94,7 +94,7 @@ public class UserService {
             );
         }
 
-        //Rolü DOCTOR olan bir User update ile ADMIN olamasın
+        //Rolü DOCTOR olan bir User update ile ADMIN olamasın, çünkü OneToOne ilişki olsun dedik
         // Eğer bu kullanıcı zaten doktor tablosunda varsa (yani bir doktor kayıtlıysa)
         if (doctorRepository.existsByUserId(user.getId()) && userUpdateRequest.getRole() != Role.DOCTOR) {
             throw new ConflictException(String.format(ErrorMessages.CANNOT_CHANGE_ROLE_OF_DOCTOR, user.getId()));
@@ -110,7 +110,7 @@ public class UserService {
                 .build();
     }
 
-    // !!! 5) deleteUserById (Kullanıcı silme)
+    // !!! 5) deleteUser (Kullanıcı silme)
     @Transactional
     public ResponseMessage<UserResponse> deleteUser(Long id) {
         User user = methodHelper.getByIdUser(id);

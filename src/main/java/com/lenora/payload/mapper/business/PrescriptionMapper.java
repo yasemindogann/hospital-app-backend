@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PrescriptionMapper {
 
-    // 🔹 Request -> Entity
+    // Request -> Entity
     public Prescription prescriptionRequestToPrescription(PrescriptionRequest prescriptionRequest, Examination examination){
         return Prescription.builder()
                 .examination(examination)
@@ -20,7 +20,7 @@ public class PrescriptionMapper {
                 .build();
     }
 
-    // 🔹 Entity -> Response
+    // Entity -> Response
     public PrescriptionResponse prescriptionToPrescriptionResponse (Prescription prescription){
         return PrescriptionResponse.builder()
                 .id(prescription.getId())
@@ -33,7 +33,7 @@ public class PrescriptionMapper {
                 .build();
     }
 
-    // (updatePrescriptionById için)
+    // Update metodunda requestten yeni veriler alındığında DB'ye setlemek için
     public void updateEntityFromRequest(Prescription prescription, PrescriptionRequest prescriptionRequest, Examination examination){
         prescription.setExamination(examination);
         prescription.setMedicineName(prescriptionRequest.getMedicineName());

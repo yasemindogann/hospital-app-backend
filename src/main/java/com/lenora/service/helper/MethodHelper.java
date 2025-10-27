@@ -69,7 +69,7 @@ public class MethodHelper {
         }
     }
 
-    // Doktor kaydı oluştururken user uygun mu (rolü doktor ve daha önce kayıtlı değil)
+    // Doktor kaydı oluştururken user uygun mu (rolü doktor ve daha önce kayıtlı değilse)
     public void validateDoctorCreation(User user) {
         validateUserIsDoctor(user);
         if (doctorRepository.existsByUserId(user.getId())) {
@@ -77,8 +77,15 @@ public class MethodHelper {
         }
     }
 
+    // Eğer bu doktor-hasta kombinasyonu başka bir muayenede zaten varsa
+    // ve bu kayıt şu an güncellediğim muayene değilse,
+    // o zaman duplicate (tekrarlı) bir kayıttır.
+
+    // Bu doktor ve bu hasta arasında zaten bir başka muayene kaydı var mı
     public boolean isDuplicateDoctorPatient(Examination existing, Doctor doctor, Patient patient) {
         return examinationRepository.existsByDoctorAndPatient(doctor, patient)
+                // Bu kayıt zaten aynı muayene mi?
+                //Yani güncellediğin muayenenin kendisi değilse
                 && !(existing.getDoctor().equals(doctor) && existing.getPatient().equals(patient));
     }
 

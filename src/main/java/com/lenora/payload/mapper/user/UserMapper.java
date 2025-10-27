@@ -40,7 +40,7 @@ public class UserMapper {
                 .build();
     }
 
-    // Entity -> Request mapping (Update için)
+    // Update metodunda requestten yeni veriler alındığında DB'ye setlemek için
     public void updateUserFromRequest(UserUpdateRequest userUpdateRequest, User user) {
         user.setUserName(userUpdateRequest.getUserName());
         user.setEmail(userUpdateRequest.getEmail());

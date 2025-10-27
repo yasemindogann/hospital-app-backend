@@ -31,7 +31,6 @@ public class UserController {
     }
 
     // !!! 2) getAllUserWithList (Tüm kullanıcıları getir)
-
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseMessage<List<UserResponse>>> getAllUserWithList(){

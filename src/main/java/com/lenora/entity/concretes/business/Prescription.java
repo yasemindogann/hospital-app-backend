@@ -1,6 +1,5 @@
 package com.lenora.entity.concretes.business;
 
-import com.lenora.entity.concretes.business.Examination;
 import jakarta.persistence.*;
 import lombok.*;
 
