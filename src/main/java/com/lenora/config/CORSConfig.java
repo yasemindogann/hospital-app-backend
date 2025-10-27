@@ -13,12 +13,13 @@ public class CORSConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // Tüm endpoint’ler
-                        .allowedOrigins("http://localhost:3000") // Frontend adresi (örnek React)
+                registry.addMapping("/**")
+                        .allowedOriginPatterns("http://localhost:3000") // geliştirirken localhost
+                        // prod ortamı eklenecekse buraya eklenir
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
-                        .allowCredentials(true)
-                        .maxAge(3600); // Preflight cache süresi (1 saat)
+                        .allowCredentials(true) // cookie gönderimi için gerekli
+                        .maxAge(3600);
             }
         };
     }

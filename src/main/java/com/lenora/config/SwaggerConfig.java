@@ -14,20 +14,18 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI customOpenAPI() {
-        final String securitySchemeName = "bearerAuth";
+        final String securitySchemeName = "cookieAuth";
 
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()
-                                .name(securitySchemeName)
-                                .type(Type.HTTP)
-                                .scheme("bearer")
-                                .bearerFormat("JWT")
-                                .in(In.HEADER)))
+                                .name("access_token") // Cookie adı
+                                .type(Type.APIKEY)
+                                .in(In.COOKIE))) // 👈 header değil, cookie
                 .info(new Info()
                         .title("Hospital API")
                         .version("1.0")
-                        .description("Hospital Management API Documentation with JWT Authentication"));
+                        .description("Hospital Management API Documentation with Cookie-based JWT Authentication"));
     }
 }
