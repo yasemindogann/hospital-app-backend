@@ -35,45 +35,33 @@ public class AuthController {
     // ✅ JSON body ile login
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
-            );
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword())
+        );
 
-            User user = userRepository.findByUserName(request.getUserName())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByUserName(request.getUserName()).orElseThrow();
 
-            String accessToken = jwtUtil.generateAccessToken(user.getUserName(), user.getRole().name());
-            String refreshToken = jwtUtil.generateRefreshToken(user.getUserName());
+        String accessToken = jwtUtil.generateAccessToken(user.getUserName(), user.getRole().name());
+        String refreshToken = jwtUtil.generateRefreshToken(user.getUserName());
 
-            // ✅ HttpOnly cookie olarak token saklama
-            ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
-                    .httpOnly(true)
-                    .secure(false) // production'da true yap
-                    .path("/")
-                    .maxAge(3600) // 1 saat
-                    .build();
+        // ✅ Tokenları sadece cookie olarak gönder
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
+                .httpOnly(true)
+                .secure(false) // üretimde true olmalı (HTTPS)
+                .path("/")
+                .maxAge(3600)
+                .build();
 
-            ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
-                    .httpOnly(true)
-                    .secure(false)
-                    .path("/")
-                    .maxAge(7 * 24 * 60 * 60) // 7 gün
-                    .build();
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60)
+                .build();
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString())
-                    .body(new LoginResponse(accessToken, refreshToken, user.getUserName(), user.getRole().name()));
-
-        } catch (org.springframework.security.authentication.BadCredentialsException e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("error", "Kullanıcı adı veya şifre hatalı"));
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Beklenmeyen bir hata oluştu"));
-        }
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString())
+                .body("Login successful");
     }
 
     // ✅ Logout → Token blacklist'e eklenecek + cookie temizlenecek
