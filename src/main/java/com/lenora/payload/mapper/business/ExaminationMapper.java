@@ -3,7 +3,7 @@ package com.lenora.payload.mapper.business;
 import com.lenora.entity.concretes.user.Doctor;
 import com.lenora.entity.concretes.business.Examination;
 import com.lenora.entity.concretes.user.Patient;
-import com.lenora.payload.request.business.ExaminationRequest;;
+import com.lenora.payload.request.business.ExaminationRequest;
 import com.lenora.payload.response.business.ExaminationResponse;
 import org.springframework.stereotype.Component;
 
